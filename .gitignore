@@ -1,0 +1,11 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Rahasia: jangan pernah di-commit
+.env
+.env.*
+*.pem
+*service_role*

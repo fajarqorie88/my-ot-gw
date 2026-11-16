@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Absen dan Lembur</title>
+<style>
+:root{--bg:#f6f6f3;--cd:#fff;--tx:#1f1f1d;--mu:#6b6a64;--bd:#e0dfd8;--ac:#0F6E56;--ok:#E1F5EE;--okt:#085041;--bl:#E6F1FB;--blt:#0C447C;--am:#FAEEDA;--amt:#633806;--rd:#FCEBEB;--rdt:#791F1F;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1a1a18;--cd:#262624;--tx:#f1efe8;--mu:#a8a69c;--bd:#3a3a37;--ac:#1D9E75;--ok:#04342C;--okt:#9FE1CB;--bl:#042C53;--blt:#B5D4F4;--am:#412402;--amt:#FAC775;--rd:#501313;--rdt:#F7C1C1;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#1a1a18;--cd:#262624;--tx:#f1efe8;--mu:#a8a69c;--bd:#3a3a37;--ac:#1D9E75;--ok:#04342C;--okt:#9FE1CB;--bl:#042C53;--blt:#B5D4F4;--am:#412402;--amt:#FAC775;--rd:#501313;--rdt:#F7C1C1;color-scheme:dark}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:15px;line-height:1.5}
+main{max-width:520px;margin:0 auto;padding:14px 14px 96px}
+.c{background:var(--cd);border:1px solid var(--bd);border-radius:14px;padding:14px;margin-bottom:10px}
+.lb{font-size:12px;color:var(--mu)}.big{font-size:22px;font-weight:500}
+.tg{display:inline-block;font-size:11px;font-weight:500;padding:2px 9px;border-radius:8px}
+.ok{background:var(--ok);color:var(--okt)}.bl{background:var(--bl);color:var(--blt)}.am{background:var(--am);color:var(--amt)}.rd{background:var(--rd);color:var(--rdt)}.nu{background:var(--bg);color:var(--mu)}
+.btn{display:block;width:100%;border:0;border-radius:12px;background:var(--ac);color:#fff;font:500 16px system-ui,sans-serif;padding:15px;cursor:pointer}
+.btn.off{background:var(--bg);color:var(--mu);text-align:center;cursor:default}
+.b2{background:transparent;color:var(--tx);border:1px solid var(--bd);font-size:14px;padding:10px;font-weight:400}
+.bar{height:6px;border-radius:3px;background:var(--bd);overflow:hidden;margin-top:8px}.bar i{display:block;height:100%;background:var(--ac)}
+.g2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.rw{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--bd);cursor:pointer}.rw:first-child{border-top:0}
+.dt{width:42px;text-align:center;font-size:12px;line-height:1.25;color:var(--mu);flex:none}.dt b{display:block;font-size:17px;font-weight:500;color:var(--tx)}
+.fl{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--bd)}.fl:first-child{border-top:0}
+input,select{font:inherit;color:var(--tx);background:var(--bg);border:1px solid var(--bd);border-radius:9px;padding:8px 10px;min-width:0}
+.fl input,.fl select{width:150px;text-align:right}
+.sg{display:flex;gap:8px;margin-top:8px}.sg button{flex:1;font:inherit;padding:9px;border-radius:9px;border:1px solid var(--bd);background:transparent;color:var(--tx);cursor:pointer}.sg button.on{background:var(--ac);border-color:var(--ac);color:#fff}
+.er{font-size:13px;color:var(--rdt);margin-top:6px}
+h2{font-size:17px;font-weight:500;margin:0}
+nav{position:fixed;left:0;right:0;bottom:0;display:flex;background:var(--cd);border-top:1px solid var(--bd);padding-bottom:env(safe-area-inset-bottom,0px);z-index:5}
+nav button{flex:1;border:0;background:transparent;color:var(--mu);font:11px system-ui,sans-serif;padding:9px 0 8px;cursor:pointer}nav button svg{display:block;margin:0 auto 2px}nav button.on{color:var(--ac);font-weight:600}
+</style></head><body>
+<main id="v"></main>
+<nav>
+<button data-t="home" onclick="go('home')"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>Beranda</button>
+<button data-t="rekap" onclick="go('rekap')"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Rekap</button>
+<button data-t="set" onclick="go('set')"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg>Pengaturan</button>
+</nav>
+<script>
+const $=s=>document.querySelector(s),K='absenlembur:v1';
+let S={set:{pokok:0,tunj:0,pola:5,mulai:'08:00',selesai:'17:00',ist:60,rnd:30},log:{},libur:[]},tab='home',mo=new Date(),ed=null;
+try{const r=localStorage.getItem(K);if(r){const o=JSON.parse(r);S.set=Object.assign(S.set,o.set||{});S.log=o.log||{};S.libur=o.libur||[]}}catch(e){}
+function save(){try{localStorage.setItem(K,JSON.stringify(S))}catch(e){}}
+const pad=n=>String(n).padStart(2,'0'),ymd=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()),hm=d=>pad(d.getHours())+':'+pad(d.getMinutes());
+const tm=t=>{const a=String(t||'').split(':');return a.length<2?NaN:+a[0]*60+ +a[1]};
+const rp=n=>'Rp '+Math.round(n).toLocaleString('id-ID'),DAY=['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
+const fm=m=>m<=0?'0 j':Math.floor(m/60)+' j'+(m%60?' '+m%60+' m':'');
+const wage=()=>((+S.set.pokok||0)+(+S.set.tunj||0))/173;
+const dd=k=>new Date(k+'T00:00:00');
+function isOff(k){const w=dd(k).getDay();return S.libur.includes(k)||w==0||(+S.set.pola==5&&w==6)}
+function mult(k,i){if(!isOff(k))return i==1?1.5:2;if(+S.set.pola==5)return i<=8?2:i==9?3:4;if(dd(k).getDay()==6)return i<=5?2:i==6?3:4;return i<=7?2:i==8?3:4}
+function calc(k,r,now){const a=tm(r.in),off=isOff(k);let b=r.out?tm(r.out):now;if(isNaN(a)||b==null||isNaN(b))return{m:0,rp:0,off};if(b<a)b+=1440;
+ let m;if(off){m=b-a;if(m>300)m-=(+S.set.ist||0)}else m=b-Math.max(tm(S.set.selesai),a);
+ m=Math.max(0,m);const q=+S.set.rnd||1;m=Math.floor(m/q)*q;let t=0,rem=m,i=1;while(rem>0){t+=Math.min(60,rem)/60*mult(k,i);rem-=60;i++}return{m,rp:t*wage(),off}}
+function cal(k){const n=new Date();return calc(k,S.log[k]||{},ymd(n)==k?n.getHours()*60+n.getMinutes():null)}
+function sum(pf){let m=0,r=0;for(const k in S.log)if(k.startsWith(pf)){const c=cal(k);m+=c.m;r+=c.rp}return{m,r}}
+function weekMin(n){const d=new Date(n);d.setDate(d.getDate()-(d.getDay()+6)%7);let m=0;for(let i=0;i<7;i++){m+=cal(ymd(d)).m;d.setDate(d.getDate()+1)}return m}
+function act(){const n=new Date(),k=ymd(n),r=S.log[k];if(!r)S.log[k]={in:hm(n)};else if(!r.out)r.out=hm(n);save();render()}
+function go(t){tab=t;ed=null;scrollTo(0,0);render()}
+function home(){const n=new Date(),k=ymd(n),r=S.log[k]||{},c=r.in?cal(k):{m:0,rp:0,off:isOff(k)},ms=sum(k.slice(0,7)),wk=weekMin(n),run=r.in&&!r.out,done=r.in&&r.out;
+ const st=run?['Sedang bekerja','ok']:done?['Sudah pulang','bl']:['Belum absen','am'];
+ const btn=done?'<div class="btn off">Selesai untuk hari ini</div>':'<button class="btn" onclick="act()">'+(run?'Absen pulang':'Absen masuk')+'</button>';
+ const lim=!c.off&&c.m>240;
+ return '<div class="c" style="text-align:center;padding:18px 14px"><div class="lb">'+n.toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'})+'</div><div style="font-size:46px;font-weight:500;line-height:1.2">'+hm(n)+'</div><span class="tg '+st[1]+'">'+st[0]+'</span>'
+ +'<div style="display:flex;justify-content:center;gap:30px;margin:14px 0"><div><div class="lb">Masuk</div><b style="font-weight:500">'+(r.in||'--:--')+'</b></div><div><div class="lb">Pulang</div><b style="font-weight:500">'+(r.out||'--:--')+'</b></div></div>'+btn+'</div>'
+ +(wage()?'':'<div class="c"><span class="tg am">Perlu diisi</span><div style="margin-top:6px">Isi gaji di Pengaturan supaya uang lembur ikut terhitung.</div></div>')
+ +'<div class="c"><div class="lb">'+(r.in?(c.off?'Hari libur: semua jam kerja dihitung lembur':'Lembur hari ini'):'Lembur hari ini')+'</div><div class="big">'+(r.in?fm(c.m):'Belum ada')+'</div>'
+ +(r.in&&wage()?'<div class="lb" style="font-size:13px">Estimasi sekitar '+rp(c.rp)+'</div>':'')
+ +(r.in&&!c.off?'<div class="bar"><i style="width:'+Math.min(100,c.m/240*100)+'%"></i></div><div class="lb" style="margin-top:4px">Batas '+fm(240)+' per hari</div>':'')
+ +(lim?'<div class="er">Sudah lewat batas 4 jam per hari.</div>':'')+'</div>'
+ +'<div class="g2"><div class="c" style="margin:0"><div class="lb">Lembur bulan ini</div><div class="big">'+fm(ms.m)+'</div></div><div class="c" style="margin:0"><div class="lb">Estimasi uang lembur</div><div class="big" style="font-size:19px;padding-top:2px">'+rp(ms.r)+'</div></div></div>'
+ +'<div class="c" style="margin-top:10px"><div style="display:flex;justify-content:space-between"><span class="lb">Lembur minggu ini</span><span class="lb">'+fm(wk)+' dari 18 j</span></div><div class="bar"><i style="width:'+Math.min(100,wk/1080*100)+'%;background:'+(wk>1080?'var(--rdt)':'var(--ac)')+'"></i></div>'+(wk>1080?'<div class="er">Sudah lewat batas 18 jam per minggu.</div>':'')+'</div>'}
+function mv(d){mo=new Date(mo.getFullYear(),mo.getMonth()+d,1);ed=null;render()}
+function edit(k,nw){ed={k,nw:!!nw};render()}
+function saveEd(){const k=$('#ed_d').value,i=$('#ed_i').value,o=$('#ed_o').value;if(!k||!i){$('#ed_e').textContent='Isi tanggal dan jam masuk dulu.';return}
+ if(ed&&ed.k&&ed.k!=k&&!ed.nw)delete S.log[ed.k];S.log[k]={in:i};if(o)S.log[k].out=o;save();ed=null;render()}
+function delEd(){if(ed&&S.log[ed.k]){delete S.log[ed.k];save()}ed=null;render()}
+function rekap(){const pf=mo.getFullYear()+'-'+pad(mo.getMonth()+1),ks=Object.keys(S.log).filter(k=>k.startsWith(pf)).sort().reverse(),t=sum(pf);
+ let h='<div style="display:flex;justify-content:space-between;align-items:center;padding:2px 4px 12px"><button class="b2 btn" style="width:42px;padding:6px" onclick="mv(-1)" aria-label="Bulan sebelumnya">&#8249;</button><h2>'+mo.toLocaleDateString('id-ID',{month:'long',year:'numeric'})+'</h2><button class="b2 btn" style="width:42px;padding:6px" onclick="mv(1)" aria-label="Bulan berikutnya">&#8250;</button></div>';
+ if(ed){const r=S.log[ed.k]||{};h+='<div class="c"><b style="font-weight:500">'+(ed.nw?'Tambah atau koreksi absen':'Koreksi absen')+'</b><div class="fl"><span>Tanggal</span><input type="date" id="ed_d" value="'+ed.k+'"></div><div class="fl"><span>Masuk</span><input type="time" id="ed_i" value="'+(r.in||'')+'"></div><div class="fl"><span>Pulang</span><input type="time" id="ed_o" value="'+(r.out||'')+'"></div><div id="ed_e" class="er"></div><div style="display:flex;gap:8px;margin-top:10px"><button class="btn" onclick="saveEd()">Simpan</button><button class="btn b2" onclick="edit(null);ed=null;render()">Batal</button>'+(!ed.nw&&S.log[ed.k]?'<button class="btn b2" style="color:var(--rdt)" onclick="delEd()">Hapus</button>':'')+'</div></div>'}
+ h+='<div class="c" style="padding:4px 14px">';
+ if(!ks.length)h+='<div style="padding:18px 0;text-align:center;color:var(--mu)">Belum ada absen di bulan ini.</div>';
+ ks.forEach(k=>{const r=S.log[k],c=cal(k),d=dd(k),tag=c.off?'<span class="tg am">Libur · '+fm(c.m)+'</span>':c.m>0?'<span class="tg bl">Lembur '+fm(c.m)+'</span>':'<span class="tg nu">Tanpa lembur</span>';
+  h+='<div class="rw" onclick="edit(\''+k+'\')"><div class="dt">'+DAY[d.getDay()]+'<b>'+d.getDate()+'</b></div><div style="flex:1;font-size:14px">'+r.in+' - '+(r.out||'belum pulang')+'<br>'+tag+'</div><div style="text-align:right;font-size:14px">'+(c.rp?rp(c.rp):'-')+'</div></div>'});
+ h+='</div><div class="c" style="display:flex;justify-content:space-between;align-items:center"><span>Total lembur <span class="lb">('+fm(t.m)+')</span></span><b style="font-weight:500;font-size:17px">'+rp(t.r)+'</b></div><button class="btn b2" onclick="edit(ymd(new Date()),1)">Tambah atau koreksi absen</button>';return h}
+function sn(f,v){S.set[f]=v===''?0:+v;save();const u=$('#uw');if(u)u.textContent=rp(wage())}
+function ss(f,v){S.set[f]=v;save()}
+function pola(p){S.set.pola=p;save();render()}
+function addLb(){const v=$('#lb_d').value;if(!v){$('#lb_e').textContent='Pilih tanggalnya dulu.';return}if(!S.libur.includes(v))S.libur.push(v);S.libur.sort();save();render()}
+function delLb(v){S.libur=S.libur.filter(x=>x!=v);save();render()}
+function set(){const s=S.set;
+ return '<div class="c" style="padding:4px 14px"><div class="fl"><span>Gaji pokok</span><input type="number" inputmode="numeric" value="'+(s.pokok||'')+'" placeholder="0" oninput="sn(\'pokok\',this.value)"></div><div class="fl"><span>Tunjangan tetap</span><input type="number" inputmode="numeric" value="'+(s.tunj||'')+'" placeholder="0" oninput="sn(\'tunj\',this.value)"></div><div class="fl"><span class="lb" style="font-size:13px">Upah sejam (gaji ÷ 173)</span><b id="uw" style="font-weight:500">'+rp(wage())+'</b></div></div>'
+ +'<div class="lb" style="margin:-4px 4px 10px">Tunjangan tidak tetap tidak ikut dihitung.</div>'
+ +'<div class="c"><div class="lb">Pola kerja</div><div class="sg"><button class="'+(+s.pola==5?'on':'')+'" onclick="pola(5)">5 hari</button><button class="'+(+s.pola==6?'on':'')+'" onclick="pola(6)">6 hari</button></div></div>'
+ +'<div class="c" style="padding:4px 14px"><div class="fl"><span>Jam masuk normal</span><input type="time" value="'+s.mulai+'" onchange="ss(\'mulai\',this.value)"></div><div class="fl"><span>Jam pulang normal</span><input type="time" value="'+s.selesai+'" onchange="ss(\'selesai\',this.value);render()"></div><div class="fl"><span>Istirahat (menit)</span><input type="number" inputmode="numeric" value="'+s.ist+'" oninput="ss(\'ist\',+this.value||0)"></div><div class="fl"><span>Pembulatan lembur</span><select onchange="ss(\'rnd\',+this.value)"><option value="1"'+(+s.rnd==1?' selected':'')+'>Per menit</option><option value="30"'+(+s.rnd==30?' selected':'')+'>Per 30 menit</option><option value="60"'+(+s.rnd==60?' selected':'')+'>Per jam penuh</option></select></div></div>'
+ +'<div class="c"><b style="font-weight:500">Hari libur nasional</b><div class="lb">Isi sendiri sesuai kalender. Di hari ini semua jam kerja dihitung lembur.</div><div style="display:flex;gap:8px;margin-top:8px"><input type="date" id="lb_d" style="flex:1"><button class="btn b2" style="width:auto;padding:8px 14px" onclick="addLb()">Tambah</button></div><div id="lb_e" class="er"></div>'
+ +S.libur.map(v=>'<div class="fl"><span>'+dd(v).toLocaleDateString('id-ID',{weekday:'short',day:'numeric',month:'long',year:'numeric'})+'</span><button class="b2" style="border-radius:8px;padding:4px 10px;background:transparent;color:var(--mu);cursor:pointer" onclick="delLb(\''+v+'\')" aria-label="Hapus tanggal">&#10005;</button></div>').join('')+'</div>'
+ +'<div class="lb" style="text-align:center;padding:4px 10px">Data tersimpan di browser perangkat ini saja. Hitungan memakai PP 35/2021 sebagai estimasi, slip gaji perusahaan yang berlaku.</div>'}
+function render(){$('#v').innerHTML=tab=='home'?home():tab=='rekap'?rekap():set();document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.t==tab))}
+setInterval(()=>{if(tab=='home'&&document.visibilityState=='visible')render()},30000);
+render();
+</script></body></html>
