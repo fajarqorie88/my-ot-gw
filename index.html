@@ -63,7 +63,7 @@ main.nar{columns:2;column-gap:18px}
 .cg{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px}.cn{font-size:11px;color:var(--mu);text-align:center;padding:2px 0}
 .cdy{min-height:42px;border-radius:10px;border:1px solid transparent;background:transparent;color:var(--tx);font:inherit;font-size:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:0;cursor:pointer}
 .cdy:hover{background:var(--bg)}.cdy.of{color:var(--rdt)}.cdy.td{border-color:var(--ac)}.cdy.sl{background:var(--g);border-color:transparent;color:#fff}
-.dot{display:inline-block;width:5px;height:5px;border-radius:50%;background:transparent}.dot.bl{background:var(--ac)}.dot.am{background:var(--amt)}.dot.nu{background:var(--mu)}.cdy.sl .dot{background:#fff}
+.dot{display:inline-block;width:5px;height:5px;border-radius:50%;background:transparent}.dot.bl{background:var(--ac)}.dot.am{background:var(--amt)}.dot.nu{background:var(--mu)}.dot.lv{background:var(--ac2)}.nv{margin-left:auto;display:flex;gap:6px}.ch .nv+.tr{margin-left:6px}.nv button{border:0;background:rgba(255,255,255,.22);color:#fff;border-radius:8px;width:30px;height:26px;font-size:17px;line-height:1;cursor:pointer}.tg.lv{background:var(--bd);color:var(--tx)}.cdy.sl .dot{background:#fff}
 .clg{display:flex;gap:12px;flex-wrap:wrap;font-size:11px;color:var(--mu);margin-top:10px}.clg span{display:flex;align-items:center;gap:5px}
 #ls{height:176px;overflow-y:auto;position:relative;border:1px solid var(--bd);border-radius:12px;overscroll-behavior:contain}
 .ar{height:58px;padding:0 10px}.ar.sel{background:var(--bl)}
@@ -86,7 +86,7 @@ function rd(k){try{const r=localStorage.getItem(k);if(!r)return null;const o=JSO
 function save(){try{if(user)localStorage.setItem(K+':'+user.id,JSON.stringify(S))}catch(e){}}
 const pad=n=>String(n).padStart(2,'0'),ymd=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()),hm=d=>pad(d.getHours())+':'+pad(d.getMinutes());
 let cl={tj:1,hr:1,lb:1};
-function tgl(h,k){h.classList.toggle('cl');const c=h.classList.contains('cl');cl[k]=c?1:0;h.setAttribute('aria-expanded',c?'false':'true')}
+function tgl(h,k){h.classList.toggle('cl');const c=h.classList.contains('cl');cl[k]=c?1:0;h.setAttribute('aria-expanded',c?'false':'true');if(k=='at')ctr()}
 let sv={st:'idle',p:0,m:'',t:'',fresh:false};
 const HC=[['#6366f1','#a855f7'],['#d97706','#fbbf24'],['#0d9488','#2dd4bf'],['#ea580c','#fb923c'],['#2563eb','#38bdf8'],['#16a34a','#4ade80'],['#9333ea','#e879f9'],['#db2777','#f472b6'],['#dc2626','#fb7185']];
 const hd=(t,n,k)=>{const c=HC[n]||HC[0],s='--h1:'+c[0]+';--h2:'+c[1];if(!k)return '<div class="ch" style="'+s+'"><b>'+t+'</b><i></i></div>';
@@ -99,7 +99,8 @@ const dd=k=>new Date(k+'T00:00:00');
 const jm=k=>{const x=(S.set.hari||{})[dd(k).getDay()];return{m:x&&x.mulai||S.set.mulai,s:x&&x.selesai||S.set.selesai}};
 function isOff(k){const w=dd(k).getDay();return S.libur.includes(k)||w==0||(+S.set.pola==5&&w==6)}
 function mult(k,i){if(!isOff(k))return i==1?1.5:2;if(+S.set.pola==5)return i<=8?2:i==9?3:4;if(dd(k).getDay()==6)return i<=5?2:i==6?3:4;return i<=7?2:i==8?3:4}
-function calc(k,r,now){const off=isOff(k);let m;
+const lv=r=>!!(r&&r.st&&r.st!='Masuk');
+function calc(k,r,now){const off=isOff(k);let m;if(lv(r))return{m:0,rp:0,off,tul:0};
  if(r.spl&&!isNaN(tm(r.spl))){m=spM(k,r)||0}
  else{const a=tm(r.in);let b=r.out?tm(r.out):now;if(isNaN(a)||b==null||isNaN(b))return{m:0,rp:0,off,tul:0};if(b<a)b+=1440;
   if(off){m=b-a;if(m>300)m-=(+S.set.ist||0)}else m=b-Math.max(tm(jm(k).s),a);
@@ -110,42 +111,46 @@ function sum(pf){let m=0,r=0,u=0;for(const k in S.log)if(k.startsWith(pf)){const
 function weekMin(n){const d=new Date(n);d.setDate(d.getDate()-(d.getDay()+6)%7);let m=0;for(let i=0;i<7;i++){m+=cal(ymd(d)).m;d.setDate(d.getDate()+1)}return m}
 function act(){const n=new Date(),k=ymd(n),r=S.log[k];if(!r)S.log[k]={in:hm(n)};else if(!r.out)r.out=hm(n);save();pushAtt(k);render()}
 function go(t){tab=t;ed=null;if(sv.st=='ok'||sv.st=='err')sv.st='idle';scrollTo(0,0);render()}
-function home(){const n=new Date(),k=ymd(n),r=S.log[k]||{},c=r.in?cal(k):{m:0,rp:0,off:isOff(k)},ms=sum(k.slice(0,7)),wk=weekMin(n),run=r.in&&!r.out,done=r.in&&r.out;
- const st=run?['Sedang bekerja','ok']:done?['Sudah pulang','bl']:['Belum absen','am'];
+let hmo=new Date(),sx=0;
+function thp(pf){const t=sum(pf),g=gajiT(),hr=Object.keys(S.log).filter(k=>k.startsWith(pf)&&!lv(S.log[k])).length,th=perHr()*hr,ti=sumI('ins',pf,t.r,g),td=sumI('ded',pf,t.r,g);return{t,g,th,ti,td,net:g+th+t.r+ti-td}}
+function hmv(d){hmo=new Date(hmo.getFullYear(),hmo.getMonth()+d,1);render()}
+function sw(e){const dx=e.changedTouches[0].clientX-sx;if(Math.abs(dx)>50)hmv(dx>0?-1:1)}
+function thpCard(){const pf=hmo.getFullYear()+'-'+pad(hmo.getMonth()+1),p=thp(pf),y=hmo.getFullYear()!=new Date().getFullYear(),ttl='THP Estimation '+hmo.toLocaleDateString('id-ID',{month:'long'})+(y?' '+hmo.getFullYear():'');
+ return '<div class="c" style="touch-action:pan-y" ontouchstart="sx=event.touches[0].clientX" ontouchend="sw(event)">'+hd(ttl,3,'th').replace('<i></i>','<span class="nv"><button type="button" onclick="event.stopPropagation();hmv(-1)" aria-label="Bulan sebelumnya">&#8249;</button><button type="button" onclick="event.stopPropagation();hmv(1)" aria-label="Bulan berikutnya">&#8250;</button></span>')+'<div class="lb">Estimasi gaji bersih bulan ini</div><div class="big">'+rp(p.net)+'</div><div class="lb" style="margin-top:6px">Gaji + tunjangan '+rp(p.g+p.th)+' · Lembur '+rp(p.t.r)+' · Insentif '+rp(p.ti)+' · Potongan '+rp(p.td)+'</div></div>'}
+function home(){const n=new Date(),k=ymd(n),r=S.log[k]||{},c=r.in?cal(k):{m:0,rp:0,off:isOff(k)},ms=sum(k.slice(0,7)),wk=weekMin(n),run=r.in&&!r.out&&!lv(r),done=r.in&&(r.out||lv(r));
+ const st=lv(r)?[r.st,'am']:run?['Sedang bekerja','ok']:done?['Sudah pulang','bl']:['Belum absen','am'];
  const btn=done?'<div class="btn off">Selesai untuk hari ini</div>':'<button class="btn" onclick="act()">'+(run?'Absen pulang':'Absen masuk')+'</button>';
  const lim=!c.off&&c.m>240;
- return '<div class="hg"><div><div class="c" style="text-align:center;padding:14px">'+hd('Absen Hari Ini',0)+'<div class="lb">'+n.toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'})+'</div><div style="font-size:46px;font-weight:500;line-height:1.2">'+hm(n)+'</div><span class="tg '+st[1]+'">'+st[0]+'</span>'+(c.off?'':'<div class="lb" style="margin-top:6px">Jam kerja hari ini '+jm(k).m+' - '+jm(k).s+'</div>')
- +'<div style="display:flex;justify-content:center;gap:30px;margin:14px 0"><div><div class="lb">Masuk</div><b style="font-weight:500">'+(r.in||'--:--')+'</b></div><div><div class="lb">Pulang</div><b style="font-weight:500">'+(r.out||'--:--')+'</b></div></div>'+btn+'</div></div><div>'
+ return '<div class="hg"><div><div class="c" style="text-align:center;padding:14px">'+hd('Absen Hari Ini',0,'ah')+'<div class="lb">'+n.toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'})+'</div><div style="font-size:46px;font-weight:500;line-height:1.2">'+hm(n)+'</div><span class="tg '+st[1]+'">'+st[0]+'</span>'+(c.off?'':'<div class="lb" style="margin-top:6px">Jam kerja hari ini '+jm(k).m+' - '+jm(k).s+'</div>')
+ +'<div style="display:flex;justify-content:center;gap:30px;margin:14px 0"><div><div class="lb">Masuk</div><b style="font-weight:500">'+(lv(r)?'--:--':r.in||'--:--')+'</b></div><div><div class="lb">Pulang</div><b style="font-weight:500">'+(r.out||'--:--')+'</b></div></div>'+btn+'</div></div><div>'
  +(wage()?'':'<div class="c"><span class="tg am">Perlu diisi</span><div style="margin-top:6px">Isi gaji di Pengaturan supaya uang lembur ikut terhitung.</div></div>')
- +'<div class="c">'+hd('Overtime Hari Ini',3)+(r.in&&c.off?'<div class="lb">Hari libur: semua jam kerja dihitung lembur</div>':'')+'<div class="big">'+(r.in?fm(c.m):'Belum ada')+'</div>'
- +(r.in&&wage()?'<div class="lb" style="font-size:13px">Estimasi sekitar '+rp(c.rp)+'</div>':'')
- +(r.in&&!c.off?'<div class="bar"><i style="width:'+Math.min(100,c.m/240*100)+'%"></i></div><div class="lb" style="margin-top:4px">Batas '+fm(240)+' per hari</div>':'')
- +(lim?'<div class="er">Sudah lewat batas 4 jam per hari.</div>':'')+'</div>'
- +'<div class="c">'+hd('Ringkasan Bulan Ini',2)+'<div class="g2"><div><div class="lb">Lembur bulan ini</div><div class="big">'+fm(ms.m)+'</div></div><div><div class="lb">Estimasi uang lembur</div><div class="big" style="font-size:19px;padding-top:2px">'+rp(ms.r)+'</div></div></div></div>'
- +'<div class="c">'+hd('Overtime Minggu Ini',7)+'<div style="display:flex;justify-content:flex-end"><span class="lb">'+fm(wk)+' dari 18 j</span></div><div class="bar"><i style="width:'+Math.min(100,wk/1080*100)+'%;background:'+(wk>1080?'var(--rdt)':'var(--ac)')+'"></i></div>'+(wk>1080?'<div class="er">Sudah lewat batas 18 jam per minggu.</div>':'')+'</div></div></div>'}
+ +thpCard()
+ +'<div class="c">'+hd('Ringkasan Bulan Ini',2,'rb')+'<div class="g2"><div><div class="lb">Lembur bulan ini</div><div class="big">'+fm(ms.m)+'</div></div><div><div class="lb">Estimasi uang lembur</div><div class="big" style="font-size:19px;padding-top:2px">'+rp(ms.r)+'</div></div></div></div>'
+ +'<div class="c">'+hd('Overtime Minggu Ini',7,'om')+'<div style="display:flex;justify-content:flex-end"><span class="lb">'+fm(wk)+' dari 18 j</span></div><div class="bar"><i style="width:'+Math.min(100,wk/1080*100)+'%;background:'+(wk>1080?'var(--rdt)':'var(--ac)')+'"></i></div>'+(wk>1080?'<div class="er">Sudah lewat batas 18 jam per minggu.</div>':'')+'</div></div></div>'}
 function mv(d){mo=new Date(mo.getFullYear(),mo.getMonth()+d,1);ed=null;render()}
 function edit(k,nw){ed={k,nw:!!nw};render()}
-function saveEd(){const k=s2d($('#ed_dt').value),i=$('#ed_i').value,o=$('#ed_o').value,sp=$('#ed_s').value,bk=$('#ed_b').value;if(!k||!i){$('#ed_e').textContent='Isi tanggal (dd/mm/yyyy) dan jam masuk dulu.';return}
- if(ed&&ed.k&&ed.k!=k&&!ed.nw){delete S.log[ed.k];delAtt(ed.k)}S.log[k]={in:i};if(o)S.log[k].out=o;if(sp){S.log[k].spl=sp;if(bk)S.log[k].brk=bk}save();pushAtt(k);mo=new Date(+k.slice(0,4),+k.slice(5,7)-1,1);ed={k,nw:false};render()}
+function stCh(){const v=$('#ed_st').value=='Masuk';document.querySelectorAll('#v .tm').forEach(e=>e.style.display=v?'':'none')}
+function saveEd(){const k=s2d($('#ed_dt').value),i=$('#ed_i').value,o=$('#ed_o').value,sp=$('#ed_s').value,bk=$('#ed_b').value,st=$('#ed_st').value,x=st!='Masuk';if(!k||(!x&&!i)){$('#ed_e').textContent='Isi tanggal (dd/mm/yyyy) dan jam masuk dulu.';return}
+ if(ed&&ed.k&&ed.k!=k&&!ed.nw){delete S.log[ed.k];delAtt(ed.k)}S.log[k]={in:x?'00:00':i};if(x)S.log[k].st=st;else{if(o)S.log[k].out=o;if(sp){S.log[k].spl=sp;if(bk)S.log[k].brk=bk}}save();pushAtt(k);mo=new Date(+k.slice(0,4),+k.slice(5,7)-1,1);ed={k,nw:false};render()}
 function delEd(){if(ed&&S.log[ed.k]){delete S.log[ed.k];save();delAtt(ed.k);ed={k:ed.k,nw:true}}else ed=null;render()}
 function calCard(pf){const y=mo.getFullYear(),m=mo.getMonth(),dm=new Date(y,m+1,0).getDate(),st=(new Date(y,m,1).getDay()+6)%7,tk=ymd(new Date());
  let g=['Sen','Sel','Rab','Kam','Jum','Sab','Min'].map(n=>'<div class="cn">'+n+'</div>').join('');
  for(let i=0;i<st;i++)g+='<div></div>';
- for(let n=1;n<=dm;n++){const k=pf+'-'+pad(n),r=S.log[k],c=r?cal(k):null,dc=!r?'':c.off?'am':c.m>0?'bl':'nu';
+ for(let n=1;n<=dm;n++){const k=pf+'-'+pad(n),r=S.log[k],c=r?cal(k):null,dc=!r?'':lv(r)?'lv':c.off?'am':c.m>0?'bl':'nu';
   g+='<button type="button" class="cdy'+(isOff(k)?' of':'')+(k==tk?' td':'')+(ed&&ed.k==k?' sl':'')+'" onclick="edit(\''+k+'\','+(r?0:1)+')" aria-label="'+d2s(k)+'">'+n+'<i class="dot'+(dc?' '+dc:'')+'"></i></button>'}
- return '<div class="c">'+hd('Kalender',0)+'<div class="cg">'+g+'</div><div class="clg"><span><i class="dot bl"></i>Lembur</span><span><i class="dot am"></i>Libur</span><span><i class="dot nu"></i>Tanpa lembur</span></div></div>'}
+ return '<div class="c">'+hd('Kalender',0,'kl')+'<div class="cg">'+g+'</div><div class="clg"><span><i class="dot bl"></i>Lembur</span><span><i class="dot am"></i>Libur</span><span><i class="dot nu"></i>Tanpa lembur</span><span><i class="dot lv"></i>Cuti/Sakit/Lainnya</span></div></div>'}
 function ctr(){const l=$('#ls');if(!l)return;let r=l.querySelector('.sel');if(!r){const t=ymd(new Date());if(t.startsWith(MO()))r=l.children[+t.slice(8)-1]}if(r)l.scrollTop=r.offsetTop-(l.clientHeight-r.offsetHeight)/2}
 function rekap(){const pf=mo.getFullYear()+'-'+pad(mo.getMonth()+1),t=sum(pf),tk=ymd(new Date());if(!ed&&tk.startsWith(pf))ed={k:tk,nw:!S.log[tk]};
  let h='<div class="mh" style="display:flex;justify-content:space-between;align-items:center;padding:2px 4px 12px"><button class="b2 btn" style="width:42px;padding:6px" onclick="mv(-1)" aria-label="Bulan sebelumnya">&#8249;</button><h2>'+mo.toLocaleDateString('id-ID',{month:'long',year:'numeric'})+'</h2><button class="b2 btn" style="width:42px;padding:6px" onclick="mv(1)" aria-label="Bulan berikutnya">&#8250;</button></div>';
  h+=calCard(pf);
- if(ed){const r=S.log[ed.k]||{};h+='<div class="c">'+hd(ed.nw?'Tambah Absen':'Koreksi Absen',4)+'<div class="fl"><span>Tanggal</span><div style="display:flex;gap:6px;align-items:center"><input type="text" id="ed_dt" inputmode="numeric" maxlength="10" placeholder="dd/mm/yyyy" style="width:116px;text-align:right" value="'+d2s(ed.k)+'" oninput="fmtD(this);netEd()"><button type="button" class="btn b2" style="width:40px;padding:8px" onclick="pickD()" aria-label="Pilih tanggal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></button><input type="date" id="ed_p" tabindex="-1" value="'+ed.k+'" onchange="if(this.value)$(\'#ed_dt\').value=d2s(this.value)" style="position:absolute;opacity:0;pointer-events:none;width:1px;height:1px"></div></div><div class="fl"><span>Masuk</span><input type="time" id="ed_i" value="'+(r.in||'')+'" oninput="netEd()"></div><div class="fl"><span>Pulang</span><input type="time" id="ed_o" value="'+(r.out||'')+'" oninput="netEd()"></div><div class="fl"><span>SPL (sampai jam)</span><input type="time" id="ed_s" value="'+(r.spl||'')+'" oninput="netEd()"></div><div class="fl"><span>OT Break</span><input type="time" id="ed_b" value="'+(r.brk||'')+'" oninput="netEd()"></div><div class="fl"><span>Lembur bersih</span><b id="ed_n" style="font-weight:500">'+netTxt(ed.k,r)+'</b></div><div id="ed_e" class="er"></div><div style="display:flex;gap:8px;margin-top:10px"><button class="btn" onclick="saveEd()">Simpan</button><button class="btn b2" onclick="edit(null);ed=null;render()">Batal</button>'+(!ed.nw&&S.log[ed.k]?'<button class="btn b2" style="color:var(--rdt)" onclick="delEd()">Hapus</button>':'')+'</div></div>'}
- h+='<div class="c">'+hd('Attendance',4)+'<div id="ls">';
+ if(ed){const r=S.log[ed.k]||{};h+='<div class="c">'+hd('Data Absensi',4,'da')+'<div class="fl"><span>Tanggal</span><div style="display:flex;gap:6px;align-items:center"><input type="text" id="ed_dt" inputmode="numeric" maxlength="10" placeholder="dd/mm/yyyy" style="width:116px;text-align:right" value="'+d2s(ed.k)+'" oninput="fmtD(this);netEd()"><button type="button" class="btn b2" style="width:40px;padding:8px" onclick="pickD()" aria-label="Pilih tanggal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></button><input type="date" id="ed_p" tabindex="-1" value="'+ed.k+'" onchange="if(this.value)$(\'#ed_dt\').value=d2s(this.value)" style="position:absolute;opacity:0;pointer-events:none;width:1px;height:1px"></div></div><div class="fl"><span>Status</span><select id="ed_st" onchange="stCh()">'+['Masuk','Cuti','Sakit','Lainnya'].map(o=>'<option'+((r.st||'Masuk')==o?' selected':'')+'>'+o+'</option>').join('')+'</select></div><div class="fl tm"><span>Masuk</span><input type="time" id="ed_i" value="'+(lv(r)?'':r.in||'')+'" oninput="netEd()"></div><div class="fl tm"><span>Pulang</span><input type="time" id="ed_o" value="'+(r.out||'')+'" oninput="netEd()"></div><div class="fl tm"><span>SPL (sampai jam)</span><input type="time" id="ed_s" value="'+(r.spl||'')+'" oninput="netEd()"></div><div class="fl tm"><span>OT Break</span><input type="time" id="ed_b" value="'+(r.brk||'')+'" oninput="netEd()"></div><div class="fl tm"><span>Lembur bersih</span><b id="ed_n" style="font-weight:500">'+netTxt(ed.k,r)+'</b></div><div id="ed_e" class="er"></div><div style="display:flex;gap:8px;margin-top:10px"><button class="btn" onclick="saveEd()">Simpan</button><button class="btn b2" onclick="edit(null);ed=null;render()">Batal</button>'+(!ed.nw&&S.log[ed.k]?'<button class="btn b2" style="color:var(--rdt)" onclick="delEd()">Hapus</button>':'')+'</div></div>'}
+ h+='<div class="c">'+hd('Attendance',4,'at')+'<div id="ls">';
  for(let n=1,dm=new Date(mo.getFullYear(),mo.getMonth()+1,0).getDate();n<=dm;n++){const k=pf+'-'+pad(n),r=S.log[k],d=dd(k),on=ed&&ed.k==k,dt='<div class="dt">'+DAY[d.getDay()]+'<b>'+n+'</b></div>';
-  if(r){const c=cal(k),tag=c.off?'<span class="tg am">Libur · '+fm(c.m)+'</span>':c.m>0?'<span class="tg bl">Lembur '+fm(c.m)+'</span>':'<span class="tg nu">Tanpa lembur</span>';
-   h+='<div class="rw ar'+(on?' sel':'')+'" onclick="edit(\''+k+'\')">'+dt+'<div style="flex:1;font-size:14px;min-width:0">'+d2s(k)+' · '+r.in+' - '+(r.out||'belum pulang')+'<br>'+tag+(r.spl?' <span class="lb">SPL '+r.spl+' · Break '+(r.brk||'00:00')+'</span>':'')+'</div><div style="text-align:right;font-size:14px">'+(c.rp?rp(c.rp):'-')+'</div></div>'}
+  if(r){const c=cal(k),tag=lv(r)?'<span class="tg lv">'+esc(r.st)+'</span>':c.off?'<span class="tg am">Libur · '+fm(c.m)+'</span>':c.m>0?'<span class="tg bl">Lembur '+fm(c.m)+'</span>':'<span class="tg nu">Tanpa lembur</span>';
+   h+='<div class="rw ar'+(on?' sel':'')+'" onclick="edit(\''+k+'\')">'+dt+'<div style="flex:1;font-size:14px;min-width:0">'+d2s(k)+(lv(r)?'':' · '+r.in+' - '+(r.out||'belum pulang'))+'<br>'+tag+(r.spl&&!lv(r)?' <span class="lb">SPL '+r.spl+' · Break '+(r.brk||'00:00')+'</span>':'')+'</div><div style="text-align:right;font-size:14px">'+(c.rp?rp(c.rp):'-')+'</div></div>'}
   else h+='<div class="rw ar'+(on?' sel':'')+'" onclick="edit(\''+k+'\',1)">'+dt+'<div style="flex:1;font-size:14px">'+d2s(k)+' · --:--<br><span class="tg nu">Belum ada absen</span></div></div>'}
  h+='</div>';
- h+='</div><div class="c">'+hd('Data Overtime',1)+'<div class="fl"><span>Total Overtime</span><b style="font-weight:500;font-size:17px">'+rp(t.r)+'</b></div><div class="fl"><span>Total Jam</span><b style="font-weight:500">'+fm(t.m)+'</b></div><div class="fl"><span>Total TUL</span><b style="font-weight:500">'+tl(t.u)+'</b></div></div>'+itemCard('ins','Insentif',t,pf)+itemCard('ded','Deduction',t,pf)+sumCard(t,pf);return h}
+ h+='</div><div class="c">'+hd('Data Overtime',1,'do')+'<div class="fl"><span>Total Overtime</span><b style="font-weight:500;font-size:17px">'+rp(t.r)+'</b></div><div class="fl"><span>Total Jam</span><b style="font-weight:500">'+fm(t.m)+'</b></div><div class="fl"><span>Total TUL</span><b style="font-weight:500">'+tl(t.u)+'</b></div></div>'+itemCard('ins','Insentif',t,pf)+itemCard('ded','Deduction',t,pf)+sumCard(t,pf);return h}
 function sn(f,v){S.set[f]=v===''?0:+v;save();pushSet();const u=$('#uw');if(u)u.textContent=rp(wage())}
 function ss(f,v){S.set[f]=v;save();pushSet()}
 function pola(p){S.set.pola=p;save();pushSet();render()}
@@ -169,20 +174,20 @@ const lg=()=>{const o=rd(K);return o&&(Object.keys(o.log).length||o.libur.length
 const IK=()=>'absenlembur:imp:'+user.id;
 function note(t){const n=$('#nt');n.textContent=t;n.style.display=t?'block':'none';clearTimeout(note.t);if(t)note.t=setTimeout(()=>note(''),4000)}
 const sy=p=>Promise.resolve(p).then(r=>{if(r&&r.error)throw r.error}).catch(()=>note('Gagal menyimpan ke server. Cek koneksi.'));
-let spCol=true;
-const attRow=k=>{const r=S.log[k],o={user_id:user.id,tanggal:k,jam_masuk:r.in,jam_pulang:r.out||null};if(spCol){o.jam_spl=r.spl||null;o.ot_break=r.brk||null}return o};
+let spCol=true,stCol=true;
+const attRow=k=>{const r=S.log[k],o={user_id:user.id,tanggal:k,jam_masuk:r.in,jam_pulang:r.out||null};if(spCol){o.jam_spl=r.spl||null;o.ot_break=r.brk||null}if(stCol)o.status=r.st||'Masuk';return o};
 const setRow=()=>{const s=S.set;return{user_id:user.id,pokok:+s.pokok||0,tunj:sumT(),pola:+s.pola,mulai:s.mulai||'08:00',selesai:s.selesai||'17:00',istirahat:+s.ist||0,pembulatan:+s.rnd||30,hari:s.hari||{},deduksi:S.ded||{},insentif:S.ins||{},tunjangan:s.tunjangan||[],profil:s.profil||{},updated_at:new Date().toISOString()}};
-function pushAtt(k){if(!user||!S.log[k])return;const oc={onConflict:'user_id,tanggal'};sy(sb.from('attendance').upsert(attRow(k),oc).then(r=>{if(r&&r.error&&/jam_spl|ot_break/.test(r.error.message||'')){spCol=false;return sb.from('attendance').upsert(attRow(k),oc)}return r}))}
+function pushAtt(k){if(!user||!S.log[k])return;const oc={onConflict:'user_id,tanggal'};sy(sb.from('attendance').upsert(attRow(k),oc).then(async r=>{for(let i=0;i<2&&r&&r.error;i++){const m=r.error.message||'';if(spCol&&/jam_spl|ot_break/.test(m))spCol=false;else if(stCol&&/status/.test(m))stCol=false;else break;r=await sb.from('attendance').upsert(attRow(k),oc)}return r}))}
 function delAtt(k){if(user)sy(sb.from('attendance').delete().eq('user_id',user.id).eq('tanggal',k))}
 function pushSet(){if(!user)return;clearTimeout(st);st=setTimeout(()=>sy(sb.from('settings').upsert(setRow())),600)}
 function pushLb(v){if(user)sy(sb.from('holidays').upsert({user_id:user.id,tanggal:v},{onConflict:'user_id,tanggal'}))}
 function delLbR(v){if(user)sy(sb.from('holidays').delete().eq('user_id',user.id).eq('tanggal',v))}
-const selAtt=async()=>{let r=await sb.from('attendance').select('tanggal,jam_masuk,jam_pulang,jam_spl,ot_break');if(r.error&&/jam_spl|ot_break/.test(r.error.message||'')){spCol=false;r=await sb.from('attendance').select('tanggal,jam_masuk,jam_pulang')}return r};
+const selAtt=async()=>{let r;for(let i=0;i<3;i++){r=await sb.from('attendance').select('tanggal,jam_masuk,jam_pulang'+(spCol?',jam_spl,ot_break':'')+(stCol?',status':''));const m=r.error&&r.error.message||'';if(!r.error)break;if(spCol&&/jam_spl|ot_break/.test(m))spCol=false;else if(stCol&&/status/.test(m))stCol=false;else break}return r};
 async function pull(){auth.ready=false;render();
  try{const[a,s,h]=await Promise.all([selAtt(),sb.from('settings').select('*').maybeSingle(),sb.from('holidays').select('tanggal')]);
   const er=a.error||s.error||h.error;if(er)throw er;
   const log={},d=s.data,set=Object.assign({},S0,{hari:{},tunjangan:[]});
-  a.data.forEach(x=>{log[x.tanggal]={in:String(x.jam_masuk).slice(0,5)};if(x.jam_pulang)log[x.tanggal].out=String(x.jam_pulang).slice(0,5);if(x.jam_spl)log[x.tanggal].spl=String(x.jam_spl).slice(0,5);if(x.ot_break)log[x.tanggal].brk=String(x.ot_break).slice(0,5)});
+  a.data.forEach(x=>{log[x.tanggal]={in:String(x.jam_masuk).slice(0,5)};if(x.jam_pulang)log[x.tanggal].out=String(x.jam_pulang).slice(0,5);if(x.jam_spl)log[x.tanggal].spl=String(x.jam_spl).slice(0,5);if(x.ot_break)log[x.tanggal].brk=String(x.ot_break).slice(0,5);if(x.status&&x.status!='Masuk')log[x.tanggal].st=x.status});
   if(d)Object.assign(set,{pokok:+d.pokok,tunj:+d.tunj,pola:d.pola,mulai:String(d.mulai).slice(0,5),selesai:String(d.selesai).slice(0,5),ist:d.istirahat,rnd:d.pembulatan,hari:d.hari||{},tunjangan:ntj(d),profil:d.profil||{}});
   S={set,log,libur:h.data.map(x=>x.tanggal).sort(),ded:nd(d&&d.deduksi),ins:nd(d&&d.insentif)};save();
   let done=null;try{done=localStorage.getItem(IK())}catch(e){}
@@ -240,7 +245,7 @@ const sumI=(w,pf,l,g)=>itemsOf(w,pf).reduce((a,d)=>a+itemAmt(d,l,g),0);
 const row=(l,v)=>'<div class="fl"><span class="lb" style="font-size:14px">'+l+'</span><span style="font-size:14px">'+(v<0?'- '+rp(-v):rp(v))+'</span></div>';
 const xb='border-radius:8px;padding:4px 10px;cursor:pointer;color:var(--mu)';
 function itemCard(w,title,t,pf){const g=gajiT(),ds=itemsOf(w,pf),sg=w=='ded'?'- ':'+ ',src=Object.keys(S[w]||{}).filter(k=>k<pf&&(S[w][k]||[]).length).sort().reverse(),bl=k=>new Date(k+'-01T00:00:00').toLocaleDateString('id-ID',{month:'long',year:'numeric'});
- return '<div class="c">'+hd(title,w=='ded'?8:5)+'<div class="lb">Berlaku untuk bulan ini saja. Bulan berikutnya bisa disalin.</div>'
+ return '<div class="c">'+hd(title,w=='ded'?8:5,w)+'<div class="lb">Berlaku untuk bulan ini saja. Bulan berikutnya bisa disalin.</div>'
  +ds.map(d=>'<div class="fl"><div style="min-width:0"><div style="font-size:14px">'+esc(d.nama)+'</div><div class="lb">'+(d.tipe=='nom'?rp(d.nilai):d.nilai+'% dari '+(d.tipe=='pl'?'lembur':'gaji'))+'</div></div><span style="display:flex;align-items:center;gap:8px"><span style="font-size:14px">'+sg+rp(itemAmt(d,t.r,g))+'</span><button class="b2" style="'+xb+'" onclick="itemDel(\''+w+'\',\''+d.id+'\')" aria-label="Hapus">&#10005;</button></span></div>').join('')
  +(src.length?'<div style="display:flex;gap:8px;margin-top:10px"><select id="'+w+'c" style="flex:1">'+src.map(k=>'<option value="'+k+'">Salin dari '+bl(k)+'</option>').join('')+'</select><button class="btn b2" style="width:auto;padding:8px 14px" onclick="itemCopy(\''+w+'\')">Salin</button></div>':'')
  +'<div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap"><input id="'+w+'n" placeholder="Nama (mis. '+(w=='ded'?'Pajak':'Bonus')+')" style="flex:2 1 130px"><select id="'+w+'t" style="flex:1 1 120px"><option value="nom">Nominal (Rp)</option><option value="pl">% dari lembur</option><option value="pg">% dari gaji</option></select><input id="'+w+'v" type="number" inputmode="decimal" placeholder="Nilai" style="flex:1 1 80px"></div><div id="'+w+'e" class="er"></div><button class="btn b2" style="margin-top:8px" onclick="itemAdd(\''+w+'\')">+ '+(w=='ded'?'Potongan':'Insentif')+'</button></div>'}
@@ -249,8 +254,8 @@ function itemAdd(w){const n=$('#'+w+'n').value.trim(),t=$('#'+w+'t').value,v=+$(
 function itemDel(w,id){const pf=MO();S[w][pf]=itemsOf(w,pf).filter(d=>d.id!=id);save();pushSet();render()}
 function itemCopy(w){const pf=MO(),s=$('#'+w+'c');if(!s||!s.value)return;const cur=itemsOf(w,pf);
  (S[w]=S[w]||{})[pf]=cur.concat((S[w][s.value]||[]).filter(x=>!cur.some(c=>c.nama==x.nama&&c.tipe==x.tipe&&c.nilai==x.nilai)).map(x=>Object.assign({},x,{id:uid()})));save();pushSet();render()}
-function sumCard(t,pf){const g=gajiT(),hr=Object.keys(S.log).filter(k=>k.startsWith(pf)).length,th=perHr()*hr,ti=sumI('ins',pf,t.r,g),td=sumI('ded',pf,t.r,g);
- return '<div class="c">'+hd('Ringkasan Gaji',6)+row('Gaji pokok',+S.set.pokok||0)+row('Tunjangan tetap',sumT())+(perHr()?row(((S.set.tunjangan||[]).filter(x=>x.jenis=='hari').map(x=>esc(x.nama)).join(', ')||'Tunjangan harian')+' ('+hr+' hari)',th):'')+row('Lembur',t.r)+row('Insentif',ti)+row('Total potongan',-td)+'<div class="fl"><b style="font-weight:500">Estimasi bersih</b><b style="font-weight:500;font-size:17px">'+rp(g+th+t.r+ti-td)+'</b></div></div>'}
+function sumCard(t,pf){const g=gajiT(),hr=Object.keys(S.log).filter(k=>k.startsWith(pf)&&!lv(S.log[k])).length,th=perHr()*hr,ti=sumI('ins',pf,t.r,g),td=sumI('ded',pf,t.r,g);
+ return '<div class="c">'+hd('Ringkasan Gaji',6,'rg')+row('Gaji pokok',+S.set.pokok||0)+row('Tunjangan tetap',sumT())+(perHr()?row(((S.set.tunjangan||[]).filter(x=>x.jenis=='hari').map(x=>esc(x.nama)).join(', ')||'Tunjangan harian')+' ('+hr+' hari)',th):'')+row('Lembur',t.r)+row('Insentif',ti)+row('Total potongan',-td)+'<div class="fl"><b style="font-weight:500">Estimasi bersih</b><b style="font-weight:500;font-size:17px">'+rp(g+th+t.r+ti-td)+'</b></div></div>'}
 function tjCard(){const ls=S.set.tunjangan||[];
  return '<div class="c">'+hd('Tunjangan',2,'tj')+'<div class="lb">Tetap ikut dihitung di upah sejam lembur. Per hari dikali jumlah hari hadir di Rekap.</div>'
  +ls.map(x=>'<div class="fl"><div style="min-width:0"><div style="font-size:14px">'+esc(x.nama)+'</div><div class="lb">'+(x.jenis=='hari'?'Per hari':'Tetap')+'</div></div><span style="display:flex;align-items:center;gap:8px"><span style="font-size:14px">'+rp(x.nilai)+(x.jenis=='hari'?' /hari':'')+'</span><button class="b2" style="'+xb+'" onclick="tjDel(\''+x.id+'\')" aria-label="Hapus">&#10005;</button></span></div>').join('')
@@ -281,7 +286,7 @@ let ding=null;
 function sndUnlock(){try{ding=new Audio(DING);ding.volume=0;const p=ding.play();if(p&&p.then)p.then(()=>{ding.pause();ding.currentTime=0;ding.volume=1}).catch(()=>{ding.volume=1})}catch(e){}}
 function sndPlay(){try{if(!ding)ding=new Audio(DING);ding.pause();ding.currentTime=0;ding.volume=1;const p=ding.play();if(p&&p.catch)p.catch(()=>{})}catch(e){}}
 function svCard(){const run=sv.st=='run',ok=sv.st=='ok',er=sv.st=='err';
- return '<div class="c">'+hd('Save Data',6)+'<div class="lb" style="margin-bottom:10px">Kirim semua data absen, pengaturan, dan hari libur ke server.</div>'
+ return '<div class="c">'+hd('Save Data',6,'sd')+'<div class="lb" style="margin-bottom:10px">Kirim semua data absen, pengaturan, dan hari libur ke server.</div>'
  +(run?'<div class="btn off">Menyimpan...</div>':'<button class="btn" onclick="svd()">Save Data</button>')
  +((run||ok)?'<div class="bar" style="height:8px"><i id="svb" style="width:'+sv.p+'%;transition:width .3s ease"></i></div><div class="lb" id="svp" style="margin-top:4px;text-align:right">'+sv.p+'%</div>':'')
  +(ok?'<svg class="ck'+(sv.fresh?' an':'')+'" width="56" height="56" viewBox="0 0 56 56" aria-hidden="true"><circle cx="28" cy="28" r="24"/><path d="M17 29l8 8 14-16"/></svg><div style="text-align:center;font-weight:500;color:var(--okt)">Data tersimpan</div>':'')
@@ -295,7 +300,7 @@ async function svd(){if(sv.st=='run')return;
  const adv=async()=>{dn++;sv.p=Math.round(dn/tot*100);const b=$('#svb'),t=$('#svp');if(b)b.style.width=sv.p+'%';if(t)t.textContent=sv.p+'%';await wt(250)};
  try{clearTimeout(st);
   chk(await sb.from('settings').upsert(setRow()));await adv();
-  const up=async c=>{const oc={onConflict:'user_id,tanggal'};let r=await sb.from('attendance').upsert(c,oc);if(r&&r.error&&/jam_spl|ot_break/.test(r.error.message||'')){spCol=false;c=c.map(x=>{const y=Object.assign({},x);delete y.jam_spl;delete y.ot_break;return y});r=await sb.from('attendance').upsert(c,oc)}return r};
+  const up=async c=>{const oc={onConflict:'user_id,tanggal'};let r=await sb.from('attendance').upsert(c,oc);for(let i=0;i<2&&r&&r.error;i++){const m=r.error.message||'';let f;if(/jam_spl|ot_break/.test(m)){spCol=false;f=['jam_spl','ot_break']}else if(/status/.test(m)){stCol=false;f=['status']}else break;c=c.map(x=>{const y=Object.assign({},x);f.forEach(z=>delete y[z]);return y});r=await sb.from('attendance').upsert(c,oc)}return r};
   for(const c of ch){chk(await up(c));await adv()}
   chk(S.libur.length?await sb.from('holidays').upsert(S.libur.map(v=>({user_id:user.id,tanggal:v})),{onConflict:'user_id,tanggal'}):0);await adv();
   sv.st='ok';sv.p=100;sv.t=hm(new Date());sv.fresh=true;render();sv.fresh=false;sndPlay()
