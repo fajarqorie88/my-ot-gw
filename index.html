@@ -48,7 +48,9 @@ nav button{flex:none;display:flex;align-items:center;gap:12px;font-size:14px;pad
 nav button svg{margin:0}
 nav button.on{background:var(--bl);color:var(--blt)}
 main{max-width:980px;padding:28px 32px 48px}
-main.nar{max-width:660px}
+main.nar{columns:2;column-gap:18px}
+.nar>*{break-inside:avoid}
+.nar>.mh{column-span:all}
 .hg{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:0 18px;align-items:start}
 #nt{left:260px;bottom:20px}
 }
@@ -78,11 +80,11 @@ const dd=k=>new Date(k+'T00:00:00');
 const jm=k=>{const x=(S.set.hari||{})[dd(k).getDay()];return{m:x&&x.mulai||S.set.mulai,s:x&&x.selesai||S.set.selesai}};
 function isOff(k){const w=dd(k).getDay();return S.libur.includes(k)||w==0||(+S.set.pola==5&&w==6)}
 function mult(k,i){if(!isOff(k))return i==1?1.5:2;if(+S.set.pola==5)return i<=8?2:i==9?3:4;if(dd(k).getDay()==6)return i<=5?2:i==6?3:4;return i<=7?2:i==8?3:4}
-function calc(k,r,now){const a=tm(r.in),off=isOff(k);let b=r.out?tm(r.out):now;if(isNaN(a)||b==null||isNaN(b))return{m:0,rp:0,off};if(b<a)b+=1440;
+function calc(k,r,now){const a=tm(r.in),off=isOff(k);let b=r.out?tm(r.out):now;if(isNaN(a)||b==null||isNaN(b))return{m:0,rp:0,off,tul:0};if(b<a)b+=1440;
  let m;if(off){m=b-a;if(m>300)m-=(+S.set.ist||0)}else m=b-Math.max(tm(jm(k).s),a);
- m=Math.max(0,m);const q=+S.set.rnd||1;m=Math.floor(m/q)*q;let t=0,rem=m,i=1;while(rem>0){t+=Math.min(60,rem)/60*mult(k,i);rem-=60;i++}return{m,rp:t*wage(),off}}
+ m=Math.max(0,m);const q=+S.set.rnd||1;m=Math.floor(m/q)*q;let t=0,rem=m,i=1;while(rem>0){t+=Math.min(60,rem)/60*mult(k,i);rem-=60;i++}return{m,rp:t*wage(),off,tul:t}}
 function cal(k){const n=new Date();return calc(k,S.log[k]||{},ymd(n)==k?n.getHours()*60+n.getMinutes():null)}
-function sum(pf){let m=0,r=0;for(const k in S.log)if(k.startsWith(pf)){const c=cal(k);m+=c.m;r+=c.rp}return{m,r}}
+function sum(pf){let m=0,r=0,u=0;for(const k in S.log)if(k.startsWith(pf)){const c=cal(k);m+=c.m;r+=c.rp;u+=c.tul||0}return{m,r,u}}
 function weekMin(n){const d=new Date(n);d.setDate(d.getDate()-(d.getDay()+6)%7);let m=0;for(let i=0;i<7;i++){m+=cal(ymd(d)).m;d.setDate(d.getDate()+1)}return m}
 function act(){const n=new Date(),k=ymd(n),r=S.log[k];if(!r)S.log[k]={in:hm(n)};else if(!r.out)r.out=hm(n);save();pushAtt(k);render()}
 function go(t){tab=t;ed=null;scrollTo(0,0);render()}
@@ -105,27 +107,27 @@ function saveEd(){const k=$('#ed_d').value,i=$('#ed_i').value,o=$('#ed_o').value
  if(ed&&ed.k&&ed.k!=k&&!ed.nw){delete S.log[ed.k];delAtt(ed.k)}S.log[k]={in:i};if(o)S.log[k].out=o;save();pushAtt(k);ed=null;render()}
 function delEd(){if(ed&&S.log[ed.k]){delete S.log[ed.k];save();delAtt(ed.k)}ed=null;render()}
 function rekap(){const pf=mo.getFullYear()+'-'+pad(mo.getMonth()+1),ks=Object.keys(S.log).filter(k=>k.startsWith(pf)).sort().reverse(),t=sum(pf);
- let h='<div style="display:flex;justify-content:space-between;align-items:center;padding:2px 4px 12px"><button class="b2 btn" style="width:42px;padding:6px" onclick="mv(-1)" aria-label="Bulan sebelumnya">&#8249;</button><h2>'+mo.toLocaleDateString('id-ID',{month:'long',year:'numeric'})+'</h2><button class="b2 btn" style="width:42px;padding:6px" onclick="mv(1)" aria-label="Bulan berikutnya">&#8250;</button></div>';
+ let h='<div class="mh" style="display:flex;justify-content:space-between;align-items:center;padding:2px 4px 12px"><button class="b2 btn" style="width:42px;padding:6px" onclick="mv(-1)" aria-label="Bulan sebelumnya">&#8249;</button><h2>'+mo.toLocaleDateString('id-ID',{month:'long',year:'numeric'})+'</h2><button class="b2 btn" style="width:42px;padding:6px" onclick="mv(1)" aria-label="Bulan berikutnya">&#8250;</button></div>';
  if(ed){const r=S.log[ed.k]||{};h+='<div class="c"><b style="font-weight:500">'+(ed.nw?'Tambah atau koreksi absen':'Koreksi absen')+'</b><div class="fl"><span>Tanggal</span><input type="date" id="ed_d" value="'+ed.k+'"></div><div class="fl"><span>Masuk</span><input type="time" id="ed_i" value="'+(r.in||'')+'"></div><div class="fl"><span>Pulang</span><input type="time" id="ed_o" value="'+(r.out||'')+'"></div><div id="ed_e" class="er"></div><div style="display:flex;gap:8px;margin-top:10px"><button class="btn" onclick="saveEd()">Simpan</button><button class="btn b2" onclick="edit(null);ed=null;render()">Batal</button>'+(!ed.nw&&S.log[ed.k]?'<button class="btn b2" style="color:var(--rdt)" onclick="delEd()">Hapus</button>':'')+'</div></div>'}
  h+='<div class="c" style="padding:4px 14px">';
  if(!ks.length)h+='<div style="padding:18px 0;text-align:center;color:var(--mu)">Belum ada absen di bulan ini.</div>';
  ks.forEach(k=>{const r=S.log[k],c=cal(k),d=dd(k),tag=c.off?'<span class="tg am">Libur · '+fm(c.m)+'</span>':c.m>0?'<span class="tg bl">Lembur '+fm(c.m)+'</span>':'<span class="tg nu">Tanpa lembur</span>';
   h+='<div class="rw" onclick="edit(\''+k+'\')"><div class="dt">'+DAY[d.getDay()]+'<b>'+d.getDate()+'</b></div><div style="flex:1;font-size:14px">'+r.in+' - '+(r.out||'belum pulang')+'<br>'+tag+'</div><div style="text-align:right;font-size:14px">'+(c.rp?rp(c.rp):'-')+'</div></div>'});
- h+='</div><div class="c" style="display:flex;justify-content:space-between;align-items:center"><span>Total lembur <span class="lb">('+fm(t.m)+')</span></span><b style="font-weight:500;font-size:17px">'+rp(t.r)+'</b></div>'+itemCard('ins','Insentif',t,pf)+itemCard('ded','Deduction',t,pf)+sumCard(t,pf)+'<button class="btn b2" onclick="edit(ymd(new Date()),1)">Tambah atau koreksi absen</button>';return h}
+ h+='</div><div class="c" style="padding:4px 14px"><div class="fl"><span>Total lembur <span class="lb">('+fm(t.m)+')</span></span><b style="font-weight:500;font-size:17px">'+rp(t.r)+'</b></div><div class="fl"><span>Total TUL</span><b style="font-weight:500">'+tl(t.u)+' jam</b></div></div>'+itemCard('ins','Insentif',t,pf)+itemCard('ded','Deduction',t,pf)+sumCard(t,pf)+'<button class="btn b2" onclick="edit(ymd(new Date()),1)">Tambah atau koreksi absen</button>';return h}
 function sn(f,v){S.set[f]=v===''?0:+v;save();pushSet();const u=$('#uw');if(u)u.textContent=rp(wage())}
 function ss(f,v){S.set[f]=v;save();pushSet()}
 function pola(p){S.set.pola=p;save();pushSet();render()}
 function addLb(){const v=$('#lb_d').value;if(!v){$('#lb_e').textContent='Pilih tanggalnya dulu.';return}if(!S.libur.includes(v)){S.libur.push(v);pushLb(v)}S.libur.sort();save();render()}
 function delLb(v){S.libur=S.libur.filter(x=>x!=v);save();delLbR(v);render()}
 function set(){const s=S.set;
- return '<div class="c" style="padding:4px 14px"><div class="fl"><span>Gaji pokok</span><input type="number" inputmode="numeric" value="'+(s.pokok||'')+'" placeholder="0" oninput="sn(\'pokok\',this.value)"></div><div class="fl"><span class="lb" style="font-size:13px">Upah sejam (gaji ÷ 173)</span><b id="uw" style="font-weight:500">'+rp(wage())+'</b></div></div>'
+ return profCard()+'<div class="c" style="padding:4px 14px"><div class="fl"><span>Gaji pokok</span><input type="number" inputmode="numeric" value="'+(s.pokok||'')+'" placeholder="0" oninput="sn(\'pokok\',this.value)"></div><div class="fl"><span class="lb" style="font-size:13px">Upah sejam (gaji ÷ 173)</span><b id="uw" style="font-weight:500">'+rp(wage())+'</b></div></div>'
  +'<div class="lb" style="margin:-4px 4px 10px">Upah sejam dihitung dari gaji pokok + tunjangan tetap.</div>'+tjCard()
  +'<div class="c"><div class="lb">Pola kerja</div><div class="sg"><button class="'+(+s.pola==5?'on':'')+'" onclick="pola(5)">5 hari</button><button class="'+(+s.pola==6?'on':'')+'" onclick="pola(6)">6 hari</button></div></div>'
  +'<div class="c" style="padding:4px 14px"><div class="fl"><span>Jam masuk (default)</span><input type="time" value="'+s.mulai+'" onchange="ss(\'mulai\',this.value)"></div><div class="fl"><span>Jam pulang (default)</span><input type="time" value="'+s.selesai+'" onchange="ss(\'selesai\',this.value);render()"></div><div class="fl"><span>Istirahat (menit)</span><input type="number" inputmode="numeric" value="'+s.ist+'" oninput="ss(\'ist\',+this.value||0)"></div><div class="fl"><span>Pembulatan lembur</span><select onchange="ss(\'rnd\',+this.value)"><option value="1"'+(+s.rnd==1?' selected':'')+'>Per menit</option><option value="30"'+(+s.rnd==30?' selected':'')+'>Per 30 menit</option><option value="60"'+(+s.rnd==60?' selected':'')+'>Per jam penuh</option></select></div></div>'
  +hariCard()
  +'<div class="c"><b style="font-weight:500">Hari libur nasional</b><div class="lb">Isi sendiri sesuai kalender. Di hari ini semua jam kerja dihitung lembur.</div><div style="display:flex;gap:8px;margin-top:8px"><input type="date" id="lb_d" style="flex:1"><button class="btn b2" style="width:auto;padding:8px 14px" onclick="addLb()">Tambah</button></div><div id="lb_e" class="er"></div>'
  +S.libur.map(v=>'<div class="fl"><span>'+dd(v).toLocaleDateString('id-ID',{weekday:'short',day:'numeric',month:'long',year:'numeric'})+'</span><button class="b2" style="border-radius:8px;padding:4px 10px;background:transparent;color:var(--mu);cursor:pointer" onclick="delLb(\''+v+'\')" aria-label="Hapus tanggal">&#10005;</button></div>').join('')+'</div>'
- +'<div class="c" style="display:flex;justify-content:space-between;align-items:center;gap:10px"><div style="min-width:0"><div class="lb">Akun</div><div style="font-size:14px;word-break:break-all">'+esc(user&&user.email)+'</div></div><button class="btn b2" style="width:auto;padding:8px 14px;flex:none" onclick="out()">Keluar</button></div>'
+ +'<button class="btn b2" style="color:var(--rdt);margin-bottom:10px" onclick="out()">Keluar</button>'
  +'<div class="lb" style="text-align:center;padding:4px 10px">Data tersimpan di akunmu dan disinkronkan ke server. Hitungan memakai PP 35/2021 sebagai estimasi, slip gaji perusahaan yang berlaku.</div>'}
 const SB_URL='https://opudagudwcsygmgswvil.supabase.co',SB_KEY='sb_publishable_Vy1hvwZDRHhQ6OA_x2AK4Q_L9Clz25Z';
 let sb=null,user=null,st=null,auth={mode:'in',em:'',msg:'',err:'',busy:false,ready:false,imp:false};
@@ -136,7 +138,7 @@ const IK=()=>'absenlembur:imp:'+user.id;
 function note(t){const n=$('#nt');n.textContent=t;n.style.display=t?'block':'none';clearTimeout(note.t);if(t)note.t=setTimeout(()=>note(''),4000)}
 const sy=p=>Promise.resolve(p).then(r=>{if(r&&r.error)throw r.error}).catch(()=>note('Gagal menyimpan ke server. Cek koneksi.'));
 const attRow=k=>({user_id:user.id,tanggal:k,jam_masuk:S.log[k].in,jam_pulang:S.log[k].out||null});
-const setRow=()=>{const s=S.set;return{user_id:user.id,pokok:+s.pokok||0,tunj:sumT(),pola:+s.pola,mulai:s.mulai||'08:00',selesai:s.selesai||'17:00',istirahat:+s.ist||0,pembulatan:+s.rnd||30,hari:s.hari||{},deduksi:S.ded||{},insentif:S.ins||{},tunjangan:s.tunjangan||[],updated_at:new Date().toISOString()}};
+const setRow=()=>{const s=S.set;return{user_id:user.id,pokok:+s.pokok||0,tunj:sumT(),pola:+s.pola,mulai:s.mulai||'08:00',selesai:s.selesai||'17:00',istirahat:+s.ist||0,pembulatan:+s.rnd||30,hari:s.hari||{},deduksi:S.ded||{},insentif:S.ins||{},tunjangan:s.tunjangan||[],profil:s.profil||{},updated_at:new Date().toISOString()}};
 function pushAtt(k){if(user&&S.log[k])sy(sb.from('attendance').upsert(attRow(k),{onConflict:'user_id,tanggal'}))}
 function delAtt(k){if(user)sy(sb.from('attendance').delete().eq('user_id',user.id).eq('tanggal',k))}
 function pushSet(){if(!user)return;clearTimeout(st);st=setTimeout(()=>sy(sb.from('settings').upsert(setRow())),600)}
@@ -147,7 +149,7 @@ async function pull(){auth.ready=false;render();
   const er=a.error||s.error||h.error;if(er)throw er;
   const log={},d=s.data,set=Object.assign({},S0,{hari:{},tunjangan:[]});
   a.data.forEach(x=>{log[x.tanggal]={in:String(x.jam_masuk).slice(0,5)};if(x.jam_pulang)log[x.tanggal].out=String(x.jam_pulang).slice(0,5)});
-  if(d)Object.assign(set,{pokok:+d.pokok,tunj:+d.tunj,pola:d.pola,mulai:String(d.mulai).slice(0,5),selesai:String(d.selesai).slice(0,5),ist:d.istirahat,rnd:d.pembulatan,hari:d.hari||{},tunjangan:ntj(d)});
+  if(d)Object.assign(set,{pokok:+d.pokok,tunj:+d.tunj,pola:d.pola,mulai:String(d.mulai).slice(0,5),selesai:String(d.selesai).slice(0,5),ist:d.istirahat,rnd:d.pembulatan,hari:d.hari||{},tunjangan:ntj(d),profil:d.profil||{}});
   S={set,log,libur:h.data.map(x=>x.tanggal).sort(),ded:nd(d&&d.deduksi),ins:nd(d&&d.insentif)};save();
   let done=null;try{done=localStorage.getItem(IK())}catch(e){}
   auth.imp=!d&&!a.data.length&&!h.data.length&&!!lg()&&!done;
@@ -223,6 +225,10 @@ function tjSync(){S.set.tunj=sumT();save();pushSet();render()}
 function tjAdd(){const n=$('#tn').value.trim(),v=+$('#tv').value,j=$('#tj').value;if(!n||!(v>0)){$('#te').textContent='Isi nama dan nominal dulu.';return}
  S.set.tunjangan=(S.set.tunjangan||[]).concat({id:uid(),nama:n,nilai:v,jenis:j});tjSync()}
 function tjDel(id){S.set.tunjangan=(S.set.tunjangan||[]).filter(x=>x.id!=id);tjSync()}
+const tl=u=>(Math.round(u*100)/100).toLocaleString('id-ID');
+function profCard(){const p=S.set.profil||{},r=(l,f,t)=>'<div class="fl"><span>'+l+'</span><input type="'+(t||'text')+'" value="'+esc(p[f]||'')+'" oninput="sp(\''+f+'\',this.value)" style="width:min(240px,62%)"></div>';
+ return '<div class="c" style="padding:4px 14px"><div class="fl"><b style="font-weight:500">Profil</b></div><div class="fl"><span>Email</span><span style="font-size:14px;word-break:break-all;text-align:right">'+esc(user&&user.email)+'</span></div>'+r('Nama','nama')+r('NPK','npk')+r('Dept','dept')+r('Seksi','seksi')+r('Golongan','gol')+r('Tanggal masuk kerja','masuk','date')+'</div>'}
+function sp(f,v){S.set.profil=S.set.profil||{};S.set.profil[f]=v;save();pushSet()}
 function render(){const v=!auth.ready?'<div class="c" style="text-align:center;margin-top:20vh;color:var(--mu)">Memuat...</div>':!user?login():(auth.imp?impCard():'')+(tab=='home'?home():tab=='rekap'?rekap():set());
  $('#v').innerHTML=v;document.body.classList.toggle('in',!!(user&&auth.ready));$('#v').className=tab=='home'?'':'nar';const hdr=$('#hd');hdr.style.display=user&&auth.ready?'':'none';if(!hdr.firstChild)hdr.innerHTML=LOGO(32)+'<span>My OT</span>';document.querySelector('nav').style.display=user&&auth.ready?'':'none';
  document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.t==tab))}
