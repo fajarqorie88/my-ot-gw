@@ -66,7 +66,7 @@ main.nar{columns:2;column-gap:18px}
 .dot{display:inline-block;width:5px;height:5px;border-radius:50%;background:transparent}.dot.bl{background:var(--ac)}.dot.am{background:var(--amt)}.dot.nu{background:var(--mu)}.dot.lv{background:var(--ac2)}.nv{margin-left:auto;display:flex;gap:6px}.ch .nv+.tr{margin-left:6px}.nv button{border:0;background:rgba(255,255,255,.22);color:#fff;border-radius:8px;width:30px;height:26px;font-size:17px;line-height:1;cursor:pointer}.tg.lv{background:var(--bd);color:var(--tx)}.cdy.sl .dot{background:#fff}
 .clg{display:flex;gap:12px;flex-wrap:wrap;font-size:11px;color:var(--mu);margin-top:10px}.clg span{display:flex;align-items:center;gap:5px}
 #ls{height:176px;overflow-y:auto;position:relative;border:1px solid var(--bd);border-radius:12px;overscroll-behavior:contain}
-.ar{height:58px;padding:0 10px}.ar.sel{background:var(--bl)}
+.ar{min-height:58px;padding:8px 10px}.ar.sel{background:var(--bl)}
 </style></head><body>
 <header id="hd"></header>
 <main id="v"></main>
@@ -122,7 +122,7 @@ function home(){const n=new Date(),k=ymd(n),r=S.log[k]||{},c=r.in?cal(k):{m:0,rp
  const btn=done?'<div class="btn off">Selesai untuk hari ini</div>':'<button class="btn" onclick="act()">'+(run?'Absen pulang':'Absen masuk')+'</button>';
  const lim=!c.off&&c.m>240;
  return '<div class="hg"><div><div class="c" style="text-align:center;padding:14px">'+hd('Absen Hari Ini',0,'ah')+'<div class="lb">'+n.toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'})+'</div><div style="font-size:46px;font-weight:500;line-height:1.2">'+hm(n)+'</div><span class="tg '+st[1]+'">'+st[0]+'</span>'+(c.off?'':'<div class="lb" style="margin-top:6px">Jam kerja hari ini '+jm(k).m+' - '+jm(k).s+'</div>')
- +'<div style="display:flex;justify-content:center;gap:30px;margin:14px 0"><div><div class="lb">Masuk</div><b style="font-weight:500">'+(lv(r)?'--:--':r.in||'--:--')+'</b></div><div><div class="lb">Pulang</div><b style="font-weight:500">'+(r.out||'--:--')+'</b></div></div>'+btn+'</div></div><div>'
+ +'<div style="display:flex;justify-content:center;gap:30px;margin:14px 0"><div><div class="lb">Masuk</div><b style="font-weight:500">'+(lv(r)?'--:--':r.in||'--:--')+'</b></div><div><div class="lb">Pulang</div><b style="font-weight:500">'+(r.spl&&!lv(r)&&!isNaN(tm(r.spl))?r.spl:(r.out||'--:--'))+'</b></div></div>'+btn+'</div></div><div>'
  +(wage()?'':'<div class="c"><span class="tg am">Perlu diisi</span><div style="margin-top:6px">Isi gaji di Pengaturan supaya uang lembur ikut terhitung.</div></div>')
  +thpCard()
  +'<div class="c">'+hd('Ringkasan Bulan Ini',2,'rb')+'<div class="g2"><div><div class="lb">Lembur bulan ini</div><div class="big">'+fm(ms.m)+'</div></div><div><div class="lb">Estimasi uang lembur</div><div class="big" style="font-size:19px;padding-top:2px">'+rp(ms.r)+'</div></div></div></div>'
@@ -147,8 +147,8 @@ function rekap(){const pf=mo.getFullYear()+'-'+pad(mo.getMonth()+1),t=sum(pf),tk
  h+='<div class="c">'+hd('Attendance',4,'at')+'<div id="ls">';
  for(let n=1,dm=new Date(mo.getFullYear(),mo.getMonth()+1,0).getDate();n<=dm;n++){const k=pf+'-'+pad(n),r=S.log[k],d=dd(k),on=ed&&ed.k==k,dt='<div class="dt">'+DAY[d.getDay()]+'<b>'+n+'</b></div>';
   if(r){const c=cal(k),tag=lv(r)?'<span class="tg lv">'+esc(r.st)+'</span>':c.off?'<span class="tg am">Libur · '+fm(c.m)+'</span>':c.m>0?'<span class="tg bl">Lembur '+fm(c.m)+'</span>':'<span class="tg nu">Tanpa lembur</span>';
-   h+='<div class="rw ar'+(on?' sel':'')+'" onclick="edit(\''+k+'\')">'+dt+'<div style="flex:1;font-size:14px;min-width:0">'+d2s(k)+(lv(r)?'':' · '+r.in+' - '+(r.out||'belum pulang'))+'<br>'+tag+(r.spl&&!lv(r)?' <span class="lb">SPL '+r.spl+' · Break '+(r.brk||'00:00')+'</span>':'')+'</div><div style="text-align:right;font-size:14px">'+(c.rp?rp(c.rp):'-')+'</div></div>'}
-  else h+='<div class="rw ar'+(on?' sel':'')+'" onclick="edit(\''+k+'\',1)">'+dt+'<div style="flex:1;font-size:14px">'+d2s(k)+' · --:--<br><span class="tg nu">Belum ada absen</span></div></div>'}
+   h+='<div class="rw ar'+(on?' sel':'')+'" onclick="edit(\''+k+'\')">'+dt+'<div style="flex:1;font-size:14px;min-width:0;line-height:1.5"><div style="display:flex;align-items:center;flex-wrap:wrap;gap:4px 6px">'+(lv(r)?'':'<span>'+r.in+' - '+(r.out||'belum pulang')+'</span>')+tag+'</div>'+(r.spl&&!lv(r)?'<div class="lb">SPL '+r.spl+' · Break '+(r.brk||'00:00')+'</div>':'')+'</div><div style="text-align:right;font-size:14px">'+(c.rp?rp(c.rp):'-')+'</div></div>'}
+  else h+='<div class="rw ar'+(on?' sel':'')+'" onclick="edit(\''+k+'\',1)">'+dt+'<div style="flex:1;font-size:14px;min-width:0;line-height:1.5"><div style="display:flex;align-items:center;flex-wrap:wrap;gap:4px 6px"><span>--:--</span><span class="tg nu">Belum ada absen</span></div></div></div>'}
  h+='</div>';
  h+='</div><div class="c">'+hd('Data Overtime',1,'do')+'<div class="fl"><span>Total Overtime</span><b style="font-weight:500;font-size:17px">'+rp(t.r)+'</b></div><div class="fl"><span>Total Jam</span><b style="font-weight:500">'+fm(t.m)+'</b></div><div class="fl"><span>Total TUL</span><b style="font-weight:500">'+tl(t.u)+'</b></div></div>'+itemCard('ins','Insentif',t,pf)+itemCard('ded','Deduction',t,pf)+sumCard(t,pf);return h}
 function sn(f,v){S.set[f]=v===''?0:+v;save();pushSet();const u=$('#uw');if(u)u.textContent=rp(wage())}
