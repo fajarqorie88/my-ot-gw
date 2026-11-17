@@ -15,6 +15,7 @@ create table if not exists public.settings (
   deduksi    jsonb    not null default '{}'::jsonb,
   insentif   jsonb    not null default '{}'::jsonb,
   tunjangan  jsonb    not null default '[]'::jsonb,
+  profil     jsonb    not null default '{}'::jsonb,
   updated_at timestamptz not null default now()
 );
 
