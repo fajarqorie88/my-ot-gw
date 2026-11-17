@@ -12,7 +12,9 @@ create table if not exists public.settings (
   istirahat  integer  not null default 60 check (istirahat >= 0),
   pembulatan integer  not null default 30 check (pembulatan in (1, 30, 60)),
   hari       jsonb    not null default '{}'::jsonb,
-  deduksi    jsonb    not null default '[]'::jsonb,
+  deduksi    jsonb    not null default '{}'::jsonb,
+  insentif   jsonb    not null default '{}'::jsonb,
+  tunjangan  jsonb    not null default '[]'::jsonb,
   updated_at timestamptz not null default now()
 );
 
