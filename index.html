@@ -41,7 +41,7 @@ nav{backdrop-filter:blur(14px)}
 #hd{display:flex;align-items:center;gap:10px;max-width:520px;margin:0 auto;padding:14px 14px 0;font-weight:700;font-size:19px;letter-spacing:.2px}
 .hg>div+div{margin-top:0}
 @media(min-width:900px){
-body{padding-left:236px}
+body.in{padding-left:236px}
 #hd{position:fixed;left:0;top:0;width:236px;max-width:none;margin:0;padding:24px 22px 10px;font-size:21px;z-index:6}
 nav{top:0;bottom:0;right:auto;width:236px;flex-direction:column;justify-content:flex-start;gap:4px;padding:92px 12px 12px;border-top:0;border-right:1px solid var(--bd)}
 nav button{display:flex;align-items:center;gap:12px;font-size:14px;padding:11px 14px;border-radius:12px;text-align:left}
@@ -175,7 +175,7 @@ async function sa(){if(!sb){auth.err='Tidak bisa terhubung ke server.';return re
 async function out(){const id=user&&user.id;try{await sb.auth.signOut()}catch(e){}
  try{localStorage.removeItem(K+':'+id)}catch(e){}S=fresh();user=null;tab='home';auth.imp=false;auth.ready=true;render()}
 function login(){const up=auth.mode=='up',ip='width:100%;margin-bottom:8px;text-align:left';
- return '<div class="c" style="margin-top:6vh;padding:18px 14px"><div style="display:flex;justify-content:center;margin-bottom:6px">'+LOGO(56)+'</div><h2 style="text-align:center;font-size:22px">My OT</h2><div class="lb" style="text-align:center;margin:2px 0 12px">'+(up?'Buat akun baru':'Masuk ke akunmu')+'</div>'
+ return '<div class="c" style="margin:10vh auto 0;max-width:400px;padding:18px 14px"><div style="display:flex;justify-content:center;margin-bottom:6px">'+LOGO(56)+'</div><h2 style="text-align:center;font-size:22px">My OT</h2><div class="lb" style="text-align:center;margin:2px 0 12px">'+(up?'Buat akun baru':'Masuk ke akunmu')+'</div>'
  +'<div class="sg" style="margin:0 0 12px"><button class="'+(up?'':'on')+'" onclick="am(\'in\')">Masuk</button><button class="'+(up?'on':'')+'" onclick="am(\'up\')">Daftar</button></div>'
  +'<input type="email" id="a_e" placeholder="Email" autocomplete="email" value="'+esc(auth.em)+'" style="'+ip+'">'
  +'<input type="password" id="a_p" placeholder="Password'+(up?' (min. 6 karakter)':'')+'" autocomplete="'+(up?'new-password':'current-password')+'" onkeydown="if(event.key==\'Enter\')sa()" style="'+ip+'">'
@@ -202,7 +202,7 @@ function dedAdd(){const n=$('#dn').value.trim(),t=$('#dt').value,v=+$('#dv').val
  (S.ded=S.ded||[]).push({id:Date.now().toString(36),nama:n,tipe:t,nilai:v});save();pushSet();render()}
 function dedDel(id){S.ded=(S.ded||[]).filter(d=>d.id!=id);save();pushSet();render()}
 function render(){const v=!auth.ready?'<div class="c" style="text-align:center;margin-top:20vh;color:var(--mu)">Memuat...</div>':!user?login():(auth.imp?impCard():'')+(tab=='home'?home():tab=='rekap'?rekap():set());
- $('#v').innerHTML=v;$('#v').className=tab=='home'?'':'nar';const hdr=$('#hd');hdr.style.display=user&&auth.ready?'':'none';if(!hdr.firstChild)hdr.innerHTML=LOGO(32)+'<span>My OT</span>';document.querySelector('nav').style.display=user&&auth.ready?'':'none';
+ $('#v').innerHTML=v;document.body.classList.toggle('in',!!(user&&auth.ready));$('#v').className=tab=='home'?'':'nar';const hdr=$('#hd');hdr.style.display=user&&auth.ready?'':'none';if(!hdr.firstChild)hdr.innerHTML=LOGO(32)+'<span>My OT</span>';document.querySelector('nav').style.display=user&&auth.ready?'':'none';
  document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.t==tab))}
 if(sb)sb.auth.onAuthStateChange((e,s)=>{const u=s&&s.user||null;if(e!='INITIAL_SESSION'&&(u&&u.id)==(user&&user.id))return;user=u;
  if(u)S=rd(K+':'+u.id)||fresh();
