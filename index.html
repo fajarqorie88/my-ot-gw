@@ -62,7 +62,9 @@ main.nar{columns:2;column-gap:18px}
 .btn.lo{background:var(--rd);color:var(--rdt);border-color:transparent;font-weight:500}
 .cg{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px}.cn{font-size:11px;color:var(--mu);text-align:center;padding:2px 0}
 .cdy{min-height:42px;border-radius:10px;border:1px solid transparent;background:transparent;color:var(--tx);font:inherit;font-size:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:0;cursor:pointer}
-.cdy:hover{background:var(--bg)}.cdy.of{color:var(--rdt)}.cdy.td{border-color:var(--ac)}.cdy.sl{background:var(--g);border-color:transparent;color:#fff}
+.cdy:hover{background:var(--bg)}.cdy.of{color:var(--rdt)}.cdy.td{border-color:var(--ac)}.cdy.sl{border-color:var(--ac);box-shadow:inset 0 0 0 1px var(--ac);font-weight:600}.cdy.td{font-weight:600}
+.f-ot{--fc:rgba(34,197,94,.32)}.f-no{--fc:rgba(130,134,165,.28)}.f-cu{--fc:rgba(250,204,21,.42)}.f-sk{--fc:rgba(239,68,68,.26)}.f-ln{--fc:rgba(168,85,247,.24)}
+.cdy[class*=" f-"]{background:var(--fc)}.sw{display:inline-block;width:12px;height:12px;border-radius:4px;background:var(--fc)}
 .dot{display:inline-block;width:5px;height:5px;border-radius:50%;background:transparent}.dot.bl{background:var(--ac)}.dot.am{background:var(--amt)}.dot.nu{background:var(--mu)}.dot.lv{background:var(--ac2)}.nv{margin-left:auto;display:flex;gap:6px}.ch .nv+.tr{margin-left:6px}.nv button{border:0;background:rgba(255,255,255,.22);color:#fff;border-radius:8px;width:30px;height:26px;font-size:17px;line-height:1;cursor:pointer}.tg.lv{background:var(--bd);color:var(--tx)}.cdy.sl .dot{background:#fff}
 .clg{display:flex;gap:12px;flex-wrap:wrap;font-size:11px;color:var(--mu);margin-top:10px}.clg span{display:flex;align-items:center;gap:5px}
 #ls{height:176px;overflow-y:auto;position:relative;border:1px solid var(--bd);border-radius:12px;overscroll-behavior:contain}
@@ -136,9 +138,9 @@ function delEd(){if(ed&&S.log[ed.k]){delete S.log[ed.k];save();delAtt(ed.k);ed={
 function calCard(pf){const y=mo.getFullYear(),m=mo.getMonth(),dm=new Date(y,m+1,0).getDate(),st=(new Date(y,m,1).getDay()+6)%7,tk=ymd(new Date());
  let g=['Sen','Sel','Rab','Kam','Jum','Sab','Min'].map(n=>'<div class="cn">'+n+'</div>').join('');
  for(let i=0;i<st;i++)g+='<div></div>';
- for(let n=1;n<=dm;n++){const k=pf+'-'+pad(n),r=S.log[k],c=r?cal(k):null,dc=!r?'':lv(r)?'lv':c.off?'am':c.m>0?'bl':'nu';
-  g+='<button type="button" class="cdy'+(isOff(k)?' of':'')+(k==tk?' td':'')+(ed&&ed.k==k?' sl':'')+'" onclick="edit(\''+k+'\','+(r?0:1)+')" aria-label="'+d2s(k)+'">'+n+'<i class="dot'+(dc?' '+dc:'')+'"></i></button>'}
- return '<div class="c">'+hd('Kalender',0,'kl')+'<div class="cg">'+g+'</div><div class="clg"><span><i class="dot bl"></i>Lembur</span><span><i class="dot am"></i>Libur</span><span><i class="dot nu"></i>Tanpa lembur</span><span><i class="dot lv"></i>Cuti/Sakit/Lainnya</span></div></div>'}
+ for(let n=1;n<=dm;n++){const k=pf+'-'+pad(n),r=S.log[k],c=r?cal(k):null,dc=!r?'':lv(r)?(r.st=='Cuti'?'cu':r.st=='Sakit'?'sk':'ln'):c.m>0?'ot':'no';
+  g+='<button type="button" class="cdy'+(dc?' f-'+dc:'')+(isOff(k)?' of':'')+(k==tk?' td':'')+(ed&&ed.k==k?' sl':'')+'" onclick="edit(\''+k+'\','+(r?0:1)+')" aria-label="'+d2s(k)+'">'+n+'</button>'}
+ return '<div class="c">'+hd('Kalender',0,'kl')+'<div class="cg">'+g+'</div><div class="clg"><span><i class="sw f-ot"></i>Ada OT</span><span><i class="sw f-no"></i>No OT</span><span><i class="sw f-cu"></i>Cuti</span><span><i class="sw f-sk"></i>Sakit</span><span><i class="sw f-ln"></i>Lainnya</span></div></div>'}
 function ctr(){const l=$('#ls');if(!l)return;let r=l.querySelector('.sel');if(!r){const t=ymd(new Date());if(t.startsWith(MO()))r=l.children[+t.slice(8)-1]}if(r)l.scrollTop=r.offsetTop-(l.clientHeight-r.offsetHeight)/2}
 function rekap(){const pf=mo.getFullYear()+'-'+pad(mo.getMonth()+1),t=sum(pf),tk=ymd(new Date());if(!ed&&tk.startsWith(pf))ed={k:tk,nw:!S.log[tk]};
  let h='<div class="mh" style="display:flex;justify-content:space-between;align-items:center;padding:2px 4px 12px"><button class="b2 btn" style="width:42px;padding:6px" onclick="mv(-1)" aria-label="Bulan sebelumnya">&#8249;</button><h2>'+mo.toLocaleDateString('id-ID',{month:'long',year:'numeric'})+'</h2><button class="b2 btn" style="width:42px;padding:6px" onclick="mv(1)" aria-label="Bulan berikutnya">&#8250;</button></div>';
@@ -167,7 +169,7 @@ function set(){const s=S.set;
  +svCard()+'<button class="btn b2 lo" style="margin-bottom:10px" onclick="out()">Logout</button>'
  +'<div class="lb" style="text-align:center;padding:4px 10px">Data tersimpan di akunmu dan disinkronkan ke server. Hitungan memakai PP 35/2021 sebagai estimasi, slip gaji perusahaan yang berlaku.</div>'}
 const SB_URL='https://opudagudwcsygmgswvil.supabase.co',SB_KEY='sb_publishable_Vy1hvwZDRHhQ6OA_x2AK4Q_L9Clz25Z';
-let sb=null,user=null,st=null,auth={mode:'in',em:'',msg:'',err:'',busy:false,ready:false,imp:false};
+let sb=null,user=null,st=null,pend=0,lastAct=Date.now(),auth={mode:'in',em:'',msg:'',err:'',busy:false,ready:false,imp:false};
 try{sb=window.supabase.createClient(SB_URL,SB_KEY)}catch(e){}
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const lg=()=>{const o=rd(K);return o&&(Object.keys(o.log).length||o.libur.length||o.set.pokok||o.set.tunj)?o:null};
@@ -179,7 +181,7 @@ const attRow=k=>{const r=S.log[k],o={user_id:user.id,tanggal:k,jam_masuk:r.in,ja
 const setRow=()=>{const s=S.set;return{user_id:user.id,pokok:+s.pokok||0,tunj:sumT(),pola:+s.pola,mulai:s.mulai||'08:00',selesai:s.selesai||'17:00',istirahat:+s.ist||0,pembulatan:+s.rnd||30,hari:s.hari||{},deduksi:S.ded||{},insentif:S.ins||{},tunjangan:s.tunjangan||[],profil:s.profil||{},updated_at:new Date().toISOString()}};
 function pushAtt(k){if(!user||!S.log[k])return;const oc={onConflict:'user_id,tanggal'};sy(sb.from('attendance').upsert(attRow(k),oc).then(async r=>{for(let i=0;i<2&&r&&r.error;i++){const m=r.error.message||'';if(spCol&&/jam_spl|ot_break/.test(m))spCol=false;else if(stCol&&/status/.test(m))stCol=false;else break;r=await sb.from('attendance').upsert(attRow(k),oc)}return r}))}
 function delAtt(k){if(user)sy(sb.from('attendance').delete().eq('user_id',user.id).eq('tanggal',k))}
-function pushSet(){if(!user)return;clearTimeout(st);st=setTimeout(()=>sy(sb.from('settings').upsert(setRow())),600)}
+function pushSet(){if(!user)return;clearTimeout(st);pend=1;st=setTimeout(()=>{pend=0;sy(sb.from('settings').upsert(setRow()))},600)}
 function pushLb(v){if(user)sy(sb.from('holidays').upsert({user_id:user.id,tanggal:v},{onConflict:'user_id,tanggal'}))}
 function delLbR(v){if(user)sy(sb.from('holidays').delete().eq('user_id',user.id).eq('tanggal',v))}
 const selAtt=async()=>{let r;for(let i=0;i<3;i++){r=await sb.from('attendance').select('tanggal,jam_masuk,jam_pulang'+(spCol?',jam_spl,ot_break':'')+(stCol?',status':''));const m=r.error&&r.error.message||'';if(!r.error)break;if(spCol&&/jam_spl|ot_break/.test(m))spCol=false;else if(stCol&&/status/.test(m))stCol=false;else break}return r};
@@ -213,8 +215,8 @@ async function sa(){if(!sb){auth.err='Tidak bisa terhubung ke server.';return re
   else{const r=await sb.auth.signInWithPassword({email:e,password:p});if(r.error)throw r.error}
  }catch(x){auth.err=em(x)}
  auth.busy=false;render()}
-async function out(){const id=user&&user.id;try{await sb.auth.signOut()}catch(e){}
- try{localStorage.removeItem(K+':'+id)}catch(e){}S=fresh();user=null;tab='home';auth.imp=false;auth.ready=true;render()}
+async function out(idle){const id=user&&user.id;await flush();try{await sb.auth.signOut()}catch(e){}
+ try{localStorage.removeItem(K+':'+id)}catch(e){}S=fresh();user=null;tab='home';auth.imp=false;auth.ready=true;auth.err='';auth.msg=idle===true?'Sesi berakhir karena tidak aktif 10 menit. Silakan masuk lagi.':'';render()}
 function login(){const up=auth.mode=='up',ip='width:100%;margin-bottom:8px;text-align:left';
  return '<div class="c" style="margin:10vh auto 0;max-width:400px;padding:18px 14px"><div style="display:flex;justify-content:center;margin-bottom:6px">'+LOGO(56)+'</div><h2 style="text-align:center;font-size:22px">My OT</h2><div class="lb" style="text-align:center;margin:2px 0 12px">'+(up?'Buat akun baru':'Masuk ke akunmu')+'</div>'
  +'<div class="sg" style="margin:0 0 12px"><button class="'+(up?'':'on')+'" onclick="am(\'in\')">Masuk</button><button class="'+(up?'on':'')+'" onclick="am(\'up\')">Daftar</button></div>'
@@ -307,6 +309,12 @@ async function svd(){if(sv.st=='run')return;
  }catch(e){sv.st='err';sv.m=em(e)||'Gagal menyimpan ke server.';render()}}
 const ff=()=>[...document.querySelectorAll('#v input:not([type=hidden]):not([disabled]):not([tabindex="-1"]),#v select:not([disabled])')].filter(x=>x.offsetParent!==null);
 document.addEventListener('keydown',e=>{const t=e.target;if(e.key!='Enter'||e.isComposing||!t||!/^(INPUT|SELECT)$/.test(t.tagName)||!t.closest('#v')||t.getAttribute('onkeydown'))return;e.preventDefault();const f=ff(),i=f.indexOf(t);if(i<0||i>=f.length-1){t.blur();return}const n=f[i+1];n.focus();if(n.select&&n.type!='date'&&n.type!='time')try{n.select()}catch(x){}setTimeout(()=>{if(!document.activeElement||document.activeElement===document.body){const g=ff();if(g[i+1])g[i+1].focus()}},50)});
+const IDLE_MS=10*60*1000;
+async function flush(){if(pend&&user){clearTimeout(st);pend=0;try{await sb.from('settings').upsert(setRow())}catch(e){}}}
+function idleChk(){if(user&&sb&&Date.now()-lastAct>=IDLE_MS)out(true)}
+['pointerdown','keydown','touchstart','scroll','wheel'].forEach(e=>addEventListener(e,()=>{lastAct=Date.now()},{passive:true,capture:true}));
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState=='visible')idleChk()});
+setInterval(idleChk,30000);
 setInterval(()=>{if(user&&auth.ready&&tab=='home'&&document.visibilityState=='visible')render()},30000);
 render();
 </script></body></html>
