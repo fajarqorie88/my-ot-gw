@@ -59,7 +59,7 @@ main.nar{columns:2;column-gap:18px}
 .ck.an{animation:ckp .45s ease-out both}.ck.an circle{animation:ckc .5s ease-out both}.ck.an path{animation:ckl .35s .45s ease-out both backwards}
 @keyframes ckc{from{stroke-dashoffset:151}to{stroke-dashoffset:0}}@keyframes ckl{from{stroke-dashoffset:40}to{stroke-dashoffset:0}}@keyframes ckp{0%{transform:scale(.7)}60%{transform:scale(1.08)}100%{transform:scale(1)}}
 .ch.tg{cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent}.ch .tr{margin-left:auto;flex:none;transition:transform .2s ease}.ch.cl .tr{transform:rotate(-90deg)}.ch.cl{margin-bottom:0;border-radius:17px}
-.sh{display:flex;justify-content:space-between;align-items:center;margin:12px 0 2px;font-size:12px;font-weight:600;letter-spacing:.4px;text-transform:uppercase;color:var(--mu)}.sh b{font-weight:600;color:var(--tx)}
+.sh{display:flex;justify-content:space-between;align-items:center;margin:12px 0 2px;font-size:12px;font-weight:600;letter-spacing:.4px;text-transform:uppercase;color:var(--mu)}.sh b{font-weight:600;color:var(--tx)}.sh{cursor:pointer;user-select:none}.shl{display:flex;align-items:center;gap:6px}.shv{transition:transform .2s}.shv.c{transform:rotate(-90deg)}
 .c input:disabled,.c select:disabled{opacity:.65}
 .btn.sv{background:var(--bg)!important;color:var(--mu);box-shadow:none;display:flex;align-items:center;justify-content:center;gap:8px;cursor:default}
 .ck{width:20px;height:20px;flex:none;fill:none;stroke:#16a34a;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}.ck path{stroke-dasharray:24}.ck.an{animation:ckp .4s ease-out}.ck.an path{animation:ckd .5s ease-out}
@@ -290,16 +290,18 @@ function edCancel(){if(edE&&ed&&!ed.nw&&S.log[ed.k])edE=false;else{ed=null;edE=f
 function edBtns(lk){const ex=ed&&!ed.nw&&S.log[ed.k],sm='flex:1;min-width:0;padding:12px 6px;font-size:14px',
  bt=edSv=='load'?'<button class="btn sv" style="flex:2;min-width:0" disabled><i class="spn"></i>Menyimpan...</button>':(edSv=='ok'||lk)?'<button class="btn sv" style="flex:2;min-width:0" disabled><svg class="ck'+(edSv=='ok'?' an':'')+'" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 13l4 4L19 7"/></svg>'+(edSv=='ok'?'Terupdate ke server':'Tersimpan')+'</button>':'<button class="btn" style="flex:2;min-width:0" onclick="saveEd()">Simpan</button>';
  return '<div style="display:flex;gap:8px;margin-top:10px">'+bt+(lk?'<button class="btn b2" style="'+sm+'" onclick="edOn()">Edit</button>':'')+'<button class="btn b2" style="'+sm+'" onclick="edCancel()">'+(lk?'Tutup':'Batal')+'</button>'+(ex?'<button class="btn b2" style="'+sm+';color:var(--rdt)" onclick="delEd()">Hapus</button>':'')+'</div>'}
+let shc={};
+function shT(k){shc[k]=!shc[k];render()}
 function thpList(pf,p){const hr=Object.keys(S.log).filter(k=>k.startsWith(pf)&&!lv(S.log[k])).length,tj=S.set.tunjangan||[],
  R=(n,d,v)=>'<div class="fl"><div style="min-width:0"><div style="font-size:14px">'+esc(n)+'</div>'+(d?'<div class="lb">'+d+'</div>':'')+'</div><span style="font-size:14px;white-space:nowrap">'+v+'</span></div>',
- SH=(t,v)=>'<div class="sh"><span>'+t+'</span><b>'+v+'</b></div>';
+ SH=(t,v,k)=>'<div class="sh" role="button" tabindex="0" aria-expanded="'+(shc[k]?'false':'true')+'" onclick="shT(\''+k+'\')" onkeydown="if(event.key==\'Enter\'||event.key==\' \'){event.preventDefault();shT(\''+k+'\')}"><span class="shl"><svg class="shv'+(shc[k]?' c':'')+'" width="12" height="12" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 4h10L7 11z" fill="currentColor"/></svg>'+t+'</span><b>'+v+'</b></div>';
  let e=R('Gaji pokok','',rp(+S.set.pokok||0)),dd='';
  tj.filter(x=>x.jenis!='hari').forEach(x=>e+=R(x.nama,'Tunjangan tetap',rp(x.nilai)));
  tj.filter(x=>x.jenis=='hari').forEach(x=>e+=R(x.nama,rp(x.nilai)+' × '+hr+' hari',rp(x.nilai*hr)));
  e+=R('Lembur',fm(p.t.m)+' · TUL '+tl(p.t.u),rp(p.t.r));
  itemsOf('ins',pf).forEach(d=>e+=R(d.nama,itLbl(d),rp(itemAmt(d,p.t.r,p.g))));
  itemsOf('ded',pf).forEach(d=>dd+=R(d.nama,itLbl(d),'- '+rp(itemAmt(d,p.t.r,p.g))));
- return SH('Earnings',rp(p.g+p.th+p.t.r+p.ti))+e+SH('Deductions','- '+rp(p.td))+(dd||'<div class="lb" style="padding:6px 0">Belum ada potongan bulan ini.</div>')}
+ return SH('Earnings',rp(p.g+p.th+p.t.r+p.ti),'e')+(shc.e?'':e)+SH('Deductions','- '+rp(p.td),'d')+(shc.d?'':(dd||'<div class="lb" style="padding:6px 0">Belum ada potongan bulan ini.</div>'))}
 function render(){const v=!auth.ready?'<div class="c" style="text-align:center;margin-top:20vh;color:var(--mu)">Memuat...</div>':!user?login():(auth.imp?impCard():'')+(tab=='home'?home():tab=='rekap'?rekap():set());
  $('#v').innerHTML=v;ctr();document.body.classList.toggle('in',!!(user&&auth.ready));$('#v').className=tab=='home'?'':'nar';const hdr=$('#hd');hdr.style.display=user&&auth.ready?'':'none';if(!hdr.firstChild)hdr.innerHTML=LOGO(32)+'<span>My OT</span>';document.querySelector('nav').style.display=user&&auth.ready?'':'none';
  document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.t==tab))}
