@@ -59,7 +59,8 @@ main.nar{columns:2;column-gap:18px}
 .ck.an{animation:ckp .45s ease-out both}.ck.an circle{animation:ckc .5s ease-out both}.ck.an path{animation:ckl .35s .45s ease-out both backwards}
 @keyframes ckc{from{stroke-dashoffset:151}to{stroke-dashoffset:0}}@keyframes ckl{from{stroke-dashoffset:40}to{stroke-dashoffset:0}}@keyframes ckp{0%{transform:scale(.7)}60%{transform:scale(1.08)}100%{transform:scale(1)}}
 .ch.tg{cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent}.ch .tr{margin-left:auto;flex:none;transition:transform .2s ease}.ch.cl .tr{transform:rotate(-90deg)}.ch.cl{margin-bottom:0;border-radius:17px}
-.sh{display:flex;justify-content:space-between;align-items:center;margin:12px 0 2px;font-size:12px;font-weight:600;letter-spacing:.4px;text-transform:uppercase;color:var(--mu)}.sh b{font-weight:600;color:var(--tx)}.sh{cursor:pointer;user-select:none}.shl{display:flex;align-items:center;gap:6px}.shv{transition:transform .2s}.shv.c{transform:rotate(-90deg)}
+.sh{display:flex;justify-content:space-between;align-items:center;margin:12px 0 2px;font-size:14px;font-weight:600;color:var(--mu)}.eye{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:36px;height:36px;border:0;background:transparent;color:var(--mu);display:grid;place-items:center;cursor:pointer;border-radius:8px}.eye:hover{color:var(--tx)}
+.sh b{font-weight:600;color:var(--tx)}.sh{cursor:pointer;user-select:none}.shl{display:flex;align-items:center;gap:6px}.shv{transition:transform .2s}.shv.c{transform:rotate(-90deg)}
 .c input:disabled,.c select:disabled{opacity:.65}
 .btn.sv{background:var(--bg)!important;color:var(--mu);box-shadow:none;display:flex;align-items:center;justify-content:center;gap:8px;cursor:default}
 .ck{width:20px;height:20px;flex:none;fill:none;stroke:#16a34a;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}.ck path{stroke-dasharray:24}.ck.an{animation:ckp .4s ease-out}.ck.an path{animation:ckd .5s ease-out}
@@ -98,7 +99,7 @@ let S=fresh(),tab='home',mo=new Date(),ed=null;
 function rd(k){try{const r=localStorage.getItem(k);if(!r)return null;const o=JSON.parse(r);const st=Object.assign({},S0,{hari:{}},o.set||{});st.tunjangan=ntj(st);return{set:st,log:o.log||{},libur:o.libur||[],ded:nd(o.ded),ins:nd(o.ins)}}catch(e){return null}}
 function save(){try{if(user)localStorage.setItem(K+':'+user.id,JSON.stringify(S))}catch(e){}}
 const pad=n=>String(n).padStart(2,'0'),ymd=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()),hm=d=>pad(d.getHours())+':'+pad(d.getMinutes());
-let cl={};
+let cl={ah:0,kl:0};
 function tgl(h,k){h.classList.toggle('cl');const c=h.classList.contains('cl');cl[k]=c?1:0;h.setAttribute('aria-expanded',c?'false':'true');if(k=='at')ctr()}
 let sv={st:'idle',p:0,m:'',t:'',fresh:false};
 const HC=[['#6366f1','#a855f7'],['#d97706','#fbbf24'],['#0d9488','#2dd4bf'],['#ea580c','#fb923c'],['#2563eb','#38bdf8'],['#16a34a','#4ade80'],['#9333ea','#e879f9'],['#db2777','#f472b6'],['#dc2626','#fb7185']];
@@ -228,13 +229,15 @@ async function sa(){if(!sb){auth.err='Tidak bisa terhubung ke server.';return re
   else{const r=await sb.auth.signInWithPassword({email:e,password:p});if(r.error)throw r.error}
  }catch(x){auth.err=em(x)}
  auth.busy=false;render()}
-async function out(idle){popX();cl={};const id=user&&user.id;await flush();try{await sb.auth.signOut()}catch(e){}
+async function out(idle){popX();cl={ah:0,kl:0};const id=user&&user.id;await flush();try{await sb.auth.signOut()}catch(e){}
  try{localStorage.removeItem(K+':'+id)}catch(e){}S=fresh();user=null;tab='home';auth.imp=false;auth.ready=true;auth.err='';auth.msg=idle===true?'Sesi berakhir karena tidak aktif 10 menit. Silakan masuk lagi.':'';render()}
+const EYE='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>',EYEX='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/><path d="M3 3l18 18"/></svg>';
+function togPw(b){const i=$('#a_p'),s=i.type=='password';i.type=s?'text':'password';b.setAttribute('aria-pressed',s);b.setAttribute('aria-label',s?'Sembunyikan password':'Tampilkan password');b.innerHTML=s?EYEX:EYE}
 function login(){const up=auth.mode=='up',ip='width:100%;margin-bottom:8px;text-align:left';
  return '<div class="c" style="margin:10vh auto 0;max-width:400px;padding:18px 14px"><div style="display:flex;justify-content:center;margin-bottom:6px">'+LOGO(56)+'</div><h2 style="text-align:center;font-size:22px">My OT</h2><div class="lb" style="text-align:center;margin:2px 0 12px">'+(up?'Buat akun baru':'Masuk ke akunmu')+'</div>'
  +'<div class="sg" style="margin:0 0 12px"><button class="'+(up?'':'on')+'" onclick="am(\'in\')">Masuk</button><button class="'+(up?'on':'')+'" onclick="am(\'up\')">Daftar</button></div>'
  +'<input type="email" id="a_e" placeholder="Email" autocomplete="email" value="'+esc(auth.em)+'" style="'+ip+'">'
- +'<input type="password" id="a_p" placeholder="Password'+(up?' (min. 6 karakter)':'')+'" autocomplete="'+(up?'new-password':'current-password')+'" onkeydown="if(event.key==\'Enter\')sa()" style="'+ip+'">'
+ +'<div style="position:relative;margin-bottom:8px"><input type="password" id="a_p" placeholder="Password'+(up?' (min. 6 karakter)':'')+'" autocomplete="'+(up?'new-password':'current-password')+'" onkeydown="if(event.key==\'Enter\')sa()" style="width:100%;text-align:left;padding-right:44px"><button type="button" class="eye" onclick="togPw(this)" aria-label="Tampilkan password" aria-pressed="false">'+EYE+'</button></div>'
  +(auth.err?'<div class="er" style="margin:0 0 8px">'+esc(auth.err)+'</div>':'')
  +(auth.msg?'<div class="tg ok" style="display:block;border-radius:10px;padding:8px 10px;margin-bottom:8px;font-size:13px;font-weight:400">'+esc(auth.msg)+'</div>':'')
  +'<button class="btn'+(auth.busy?' off':'')+'" '+(auth.busy?'disabled':'onclick="sa()"')+'>'+(auth.busy?'Memproses...':up?'Daftar':'Masuk')+'</button></div>'}
