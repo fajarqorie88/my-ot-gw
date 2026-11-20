@@ -124,12 +124,12 @@ function sum(pf){let m=0,r=0,u=0;for(const k in S.log)if(k.startsWith(pf)){const
 function weekMin(n){const d=new Date(n);d.setDate(d.getDate()-(d.getDay()+6)%7);let m=0;for(let i=0;i<7;i++){m+=cal(ymd(d)).m;d.setDate(d.getDate()+1)}return m}
 function act(){const n=new Date(),k=ymd(n),r=S.log[k];if(!r){tmPop();return}if(!r.out)r.out=hm(n);save();pushAtt(k);render()}
 function go(t){tab=t;ed=null;if(sv.st=='ok'||sv.st=='err')sv.st='idle';scrollTo(0,0);render()}
-let hmo=new Date(),sx=0;
+let hmo=new Date(),sx=0,sY=0,sT=0;
 function thp(pf){const t=sum(pf),g=gajiT(),hr=Object.keys(S.log).filter(k=>k.startsWith(pf)&&!lv(S.log[k])).length,th=perHr()*hr,ti=sumI('ins',pf,t.r,g),td=sumI('ded',pf,t.r,g);return{t,g,th,ti,td,net:g+th+t.r+ti-td}}
 function hmv(d){hmo=new Date(hmo.getFullYear(),hmo.getMonth()+d,1);render()}
-function sw(e){const dx=e.changedTouches[0].clientX-sx;if(Math.abs(dx)>50)hmv(dx>0?-1:1)}
+function sw(e){const t=e.changedTouches[0],dx=t.clientX-sx,dy=t.clientY-sY;if(Math.abs(dx)>=80&&Math.abs(dx)>=Math.abs(dy)*2&&Date.now()-sT<600)hmv(dx>0?-1:1)}
 function thpCard(){const pf=hmo.getFullYear()+'-'+pad(hmo.getMonth()+1),p=thp(pf),y=hmo.getFullYear()!=new Date().getFullYear(),ttl='THP Estimation '+hmo.toLocaleDateString('id-ID',{month:'long'})+(y?' '+hmo.getFullYear():'');
- return '<div class="c" style="touch-action:pan-y" ontouchstart="sx=event.touches[0].clientX" ontouchend="sw(event)">'+hd(ttl,3,'th').replace('<i></i>','<span class="nv"><button type="button" onclick="event.stopPropagation();hmv(-1)" aria-label="Bulan sebelumnya">&#8249;</button><button type="button" onclick="event.stopPropagation();hmv(1)" aria-label="Bulan berikutnya">&#8250;</button></span>')+'<div class="lb">Estimasi gaji bersih bulan ini</div><div class="big">'+rp(p.net)+'</div>'+thpList(pf,p)+'</div>'}
+ return '<div class="c" style="touch-action:pan-y" ontouchstart="sx=event.touches[0].clientX;sY=event.touches[0].clientY;sT=Date.now()" ontouchend="sw(event)">'+hd(ttl,3,'th').replace('<i></i>','<span class="nv"><button type="button" onclick="event.stopPropagation();hmv(-1)" aria-label="Bulan sebelumnya">&#8249;</button><button type="button" onclick="event.stopPropagation();hmv(1)" aria-label="Bulan berikutnya">&#8250;</button></span>')+'<div class="lb">Estimasi gaji bersih bulan ini</div><div class="big">'+rp(p.net)+'</div>'+thpList(pf,p)+'</div>'}
 function home(){const n=new Date(),k=ymd(n),r=S.log[k]||{},c=r.in?cal(k):{m:0,rp:0,off:isOff(k)},ms=sum(k.slice(0,7)),wk=weekMin(n),run=r.in&&!r.out&&!lv(r),done=r.in&&(r.out||lv(r));
  const st=lv(r)?[r.st,'am']:run?['Sedang bekerja','ok']:done?['Sudah pulang','bl']:['Belum absen','am'];
  const btn=done?'<div class="btn off">Selesai untuk hari ini</div>':'<button class="btn" onclick="act()">'+(run?'Absen pulang':'Absen masuk')+'</button>';
